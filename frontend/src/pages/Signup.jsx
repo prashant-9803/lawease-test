@@ -3,15 +3,139 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
+import { GoogleLogin } from '@react-oauth/google';
+import { useDispatch } from 'react-redux';
+import { googleAuth } from '@/services/operations/authAPI';
 
 export default function Signup() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [accountType, setAccountType] = useState('user')
+  const [otpSent, setOtpSent] = useState(false);
+  
+  // Split the form data into two steps
+  const [emailData, setEmailData] = useState({
+    email: ''
+  });
+
+  const [signupData, setSignupData] = useState({
+    firstName: '',
+    lastName: '',
+    password: '',
+    confirmPassword: '',
+    otp: ''
+  });
+
+  // Handle email input for OTP step
+  const handleEmailChange = (e) => {
+    setEmailData({
+      ...emailData,
+      [e.target.id]: e.target.value
+    });
+  };
+
+  // Handle other inputs for signup step
+  const handleSignupDataChange = (e) => {
+    setSignupData({
+      ...signupData,
+      [e.target.id]: e.target.value
+    });
+  };
+
+  // Step 1: Send OTP
+  const handleSendOTP = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/auth/sendotp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: emailData.email }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setOtpSent(true);
+        toast.success('OTP sent successfully!');
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error('Failed to send OTP');
+    }
+  };
+
+  // Step 2: Complete Signup
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: emailData.email,
+          firstName: signupData.firstName,
+          lastName: signupData.lastName,
+          password: signupData.password,
+          confirmPassword: signupData.confirmPassword,
+          otp: signupData.otp,
+          accountType: accountType === 'user' ? 'Client' : 'Provider'
+        }),
+      });
+
+      console.log('Signup response1 :', response);
+
+
+      const data = await response.json();
+
+      console.log('Signup response 2:', data);
+      
+      if (data.success) {
+        toast.success('Signup successful!');
+        if (accountType === 'Provider') {
+          // Make sure the token is being received from the backend
+          if (data.token) {
+            // Store the token without JSON.stringify
+            localStorage.setItem('token', data.token);
+            console.log('Token saved:', data.token); // Debug log
+            navigate('/form');
+          } else {
+            throw new Error('No token received from server');
+          }
+        } else {
+          navigate('/login');
+        }
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      toast.error(error.message || 'Signup failed');
+    }
+  };
+  const handleGoogleSuccess = (credentialResponse) => {
+    dispatch(googleAuth(
+      credentialResponse.credential,
+      accountType === 'user' ? 'Client' : 'Provider',
+      navigate
+    ));
+  };
+
+  const handleGoogleError = () => {
+    toast.error("Google sign in failed");
+  };
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 mt-14">
       {/* Left side - Project name and logo */}
       <div className="w-1/3 bg-gray-950 text-white flex flex-col items-center justify-center p-8">
-        {/* logo */}
+        {/* Your existing logo SVG */}
         <svg version="1.1" className="invert scale-50" xmlns="http://www.w3.org/2000/svg" width="506" height="148">
 <path d="M0 0 C166.98 0 333.96 0 506 0 C506 48.84 506 97.68 506 148 C339.02 148 172.04 148 0 148 C0 99.16 0 50.32 0 0 Z " fill="#FEFEFE" transform="translate(0,0)"/>
 <path d="M0 0 C34.32 0 68.64 0 104 0 C104 3.3 104 6.6 104 10 C102.02 10 100.04 10 98 10 C98 27.16 98 44.32 98 62 C99.98 62 101.96 62 104 62 C104 65.3 104 68.6 104 72 C69.68 72 35.36 72 0 72 C0 68.7 0 65.4 0 62 C2.31 62 4.62 62 7 62 C7 44.84 7 27.68 7 10 C4.69 10 2.38 10 0 10 C0 6.7 0 3.4 0 0 Z " fill="#060606" transform="translate(21,56)"/>
@@ -30,82 +154,164 @@ export default function Signup() {
 <path d="M0 0 C0.66 0 1.32 0 2 0 C3.67257264 3.78908876 5.33705115 7.58167885 7 11.375 C7.47695312 12.45523438 7.95390625 13.53546875 8.4453125 14.6484375 C8.89648438 15.6796875 9.34765625 16.7109375 9.8125 17.7734375 C10.23144531 18.72653809 10.65039062 19.67963867 11.08203125 20.66162109 C12 23 12 23 12 25 C4.74 25 -2.52 25 -10 25 C-6.625 14.875 -6.625 14.875 -5.17578125 11.62109375 C-4.86962891 10.92822266 -4.56347656 10.23535156 -4.24804688 9.52148438 C-3.93931641 8.83376953 -3.63058594 8.14605469 -3.3125 7.4375 C-2.99216797 6.71498047 -2.67183594 5.99246094 -2.34179688 5.24804688 C-1.56487057 3.49706371 -0.78297505 1.74828676 0 0 Z " fill="#F7F7F7" transform="translate(215,58)"/>
 <path d="M0 0 C3.3437141 3.8711138 5.15154753 8.4273026 7.1875 13.0625 C7.55552734 13.87783203 7.92355469 14.69316406 8.30273438 15.53320312 C8.65013672 16.31759766 8.99753906 17.10199219 9.35546875 17.91015625 C9.82956177 18.97955444 9.82956177 18.97955444 10.31323242 20.07055664 C11 22 11 22 11 25 C3.74 25 -3.52 25 -11 25 C-9.9275 22.36 -8.855 19.72 -7.75 17 C-7.4209668 16.1853125 -7.09193359 15.370625 -6.75292969 14.53125 C-4.71941998 9.56097951 -2.45369759 4.77711035 0 0 Z " fill="#F8F8F8" transform="translate(381,58)"/></svg>
       </div>
-
+  
       {/* Right side - Signup form */}
-      <div className="w-2/3 flex items-center justify-center p-3">
+      <div className="w-2/3 flex items-center justify-center p-8">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-3xl font-bold text-center">
+            <CardTitle className="text-2xl font-bold text-center">
               Create an Account
             </CardTitle>
             <CardDescription className="text-center">
-              Join LawEase today. 
-              Please enter your details to create your account.
+              Choose your account type and enter your details to get started.
             </CardDescription>
           </CardHeader>
-          <CardContent >
-            <div className="flex justify-center mb-6">
-              <div className="inline-flex rounded-md shadow-sm" role="group">
-                <button
-                  type="button"
-                  className={`px-4 py-2 text-sm font-medium rounded-l-lg focus:z-10 focus:ring-2 focus:ring-primary transition-colors ${
-                    accountType === 'user'
-                      ? 'bg-black text-white'
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                  }`}
-                  onClick={() => setAccountType('user')}
-                >
-                  User
-                </button>
-                <button
-                  type="button"
-                  className={`px-4 py-2 text-sm font-medium rounded-r-lg focus:z-10 focus:ring-2 focus:ring-primary transition-colors ${
-                    accountType === 'lawyer'
-                      ? 'bg-black text-white'
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                  }`}
-                  onClick={() => setAccountType('lawyer')}
-                >
-                  Lawyer
-                </button>
+          <CardContent>
+            {/* Account Type Selection */}
+            <div className="mb-6">
+              <Label>Account Type</Label>
+              <div className="flex mt-2">
+                <div className="inline-flex rounded-md shadow-sm" role="group">
+                  <button
+                    type="button"
+                    className={`px-4 py-2 text-sm font-medium rounded-l-lg focus:z-10 focus:ring-2 focus:ring-primary transition-colors ${
+                      accountType === 'user' ? 'bg-black text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                    onClick={() => setAccountType('user')}
+                  >
+                    User
+                  </button>
+                  <button
+                    type="button"
+                    className={`px-4 py-2 text-sm font-medium rounded-r-lg focus:z-10 focus:ring-2 focus:ring-primary transition-colors ${
+                      accountType === 'Provider' ? 'bg-black text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                    onClick={() => setAccountType('Provider')}
+                  >
+                    Provider
+                  </button>
+                </div>
               </div>
             </div>
-            <form className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+  
+            {/* Step 1: Email and OTP */}
+            {!otpSent ? (
+              <form onSubmit={handleSendOTP} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" placeholder="Enter First Name" required />
+                  <Label htmlFor="email">Email</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    value={emailData.email}
+                    onChange={handleEmailChange}
+                    placeholder="john@example.com" 
+                    required 
+                  />
                 </div>
+                <Button className="w-full" type="submit">
+                  Send OTP
+                </Button>
+              </form>
+            ) : (
+              /* Step 2: Complete Signup Form */
+              <form onSubmit={handleSignup} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input 
+                      id="firstName" 
+                      value={signupData.firstName}
+                      onChange={handleSignupDataChange}
+                      required 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input 
+                      id="lastName" 
+                      value={signupData.lastName}
+                      onChange={handleSignupDataChange}
+                      required 
+                    />
+                  </div>
+                </div>
+  
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                <Input id="lastName" placeholder="Enter Last Name" required />
+                  <Label htmlFor="password">Password</Label>
+                  <Input 
+                    id="password" 
+                    type="password"
+                    value={signupData.password}
+                    onChange={handleSignupDataChange}
+                    required 
+                  />
+                </div>
+  
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input 
+                    id="confirmPassword" 
+                    type="password"
+                    value={signupData.confirmPassword}
+                    onChange={handleSignupDataChange}
+                    required 
+                  />
+                </div>
+  
+                <div className="space-y-2">
+                  <Label htmlFor="otp">OTP</Label>
+                  <Input 
+                    id="otp" 
+                    value={signupData.otp}
+                    onChange={handleSignupDataChange}
+                    placeholder="Enter OTP" 
+                    required 
+                  />
+                </div>
+  
+                <Button className="w-full" type="submit">
+                  Sign Up
+                </Button>
+              </form>
+            )}
+  
+            {/* Google Sign In */}
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Or continue with
+                  </span>
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="john@example.com" required />
+  
+              <div className="mt-4 flex justify-center">
+              <div className="mt-4 flex justify-center">
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    theme="outline"
+                    size="large"
+                    text="continue_with"
+                    shape="rectangular"
+                    useOneTap={false}
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input id="confirmPassword" type="password" required />
-              </div>
-              <Button className="w-full" type="submit">
-                Sign Up
-              </Button>
-            </form>
+            </div>
+  
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}
               <a href="/login" className="text-primary hover:underline">
-                Log in
+                Login
               </a>
             </div>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }

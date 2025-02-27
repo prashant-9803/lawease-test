@@ -303,3 +303,52 @@ exports.getAllPendingCases = async(req,res) => {
         })
     }
 }
+
+// Update case status
+exports.updateCaseStatus = async (req, res) => {
+    try {
+        const { caseId, status } = req.body;
+        const providerId = req.user.id;
+
+        if (!caseId || !status) {
+            return res.status(400).json({
+                success: false,
+                message: "Case ID and status are required"
+            });
+        }
+
+        const case_ = await Case.findById(caseId);
+        
+        if (!case_) {
+            return res.status(404).json({
+                success: false,
+                message: "Case not found"
+            });
+        }
+
+        // Verify the provider is authorized to update this case
+        if (case_.serviceProvider.toString() !== providerId) {
+            return res.status(403).json({
+                success: false,
+                message: "Not authorized to update this case"
+            });
+        }
+
+        // Update the case status
+        case_.status = status;
+        await case_.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Case status updated successfully"
+        });
+
+    } catch (error) {
+        console.error("Error in updateCaseStatus:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Error while updating case status",
+            error: error.message
+        });
+    }
+};

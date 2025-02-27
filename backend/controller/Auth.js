@@ -5,8 +5,71 @@ const bcrypt = require("bcrypt");
 const Profile = require("../models/Profile");
 const jwt = require("jsonwebtoken");
 const mailSender = require("../utils/mailSender");
+const { OAuth2Client } = require('google-auth-library');
+const client = require("../config/googleAuth");
 const { uploadToCloudinary } = require("../utils/uploadToCloudinary");
 require("dotenv").config();
+
+exports.googleAuth = async (req, res) => {
+  try {
+    const { credential, accountType } = req.body;
+    
+    // Verify Google token
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.VITE_GOOGLE_CLIENT_ID
+    });
+    
+    if (!ticket) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Google token"
+      });
+    }
+
+    const payload = ticket.getPayload();
+    const { email, given_name, family_name, picture } = payload;
+
+    // Check if user exists
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create new user
+      user = await User.create({
+        firstName: given_name,
+        lastName: family_name,
+        email,
+        image: picture,
+        accountType,
+        password: email + process.env.JWT_SECRET, // Generate a random password
+      });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { email: user.email, id: user._id, accountType: user.accountType },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "2h",
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      user,
+      token,
+      message: "User logged in successfully",
+    });
+
+  } catch (error) {
+    console.error("Google auth error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Google authentication failed",
+      error: error.message
+    });
+  }
+};
 
 //otp send before signup
 exports.sendotp = async (req, res) => {

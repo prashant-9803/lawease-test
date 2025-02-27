@@ -7,6 +7,7 @@ const { auth, isProvider } = require("../middleware/auth");
 const { setProfile } = require("../controller/Profile");
 
 
+const { googleAuth } = require("../controller/Auth");
 
 
 //import middleware
@@ -23,6 +24,8 @@ router.post("/signup", signup)
 
 //route for sending otp to the mail
 router.post("/sendotp", sendotp)
+
+router.post("/google",googleAuth);
 
 
 // //route for changing password
