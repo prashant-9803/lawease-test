@@ -7,8 +7,12 @@ const dotenv = require("dotenv");
 dotenv.config();
 const { cloudinaryConnect } = require("./config/cloudinary");
 const fileUpload = require("express-fileupload");
+const { Server } = require("socket.io");
+const messageRoutes = require("./routes/Message")
 
 const PORT = process.env.PORT || 4000;
+
+
 
 // db connection
 database.connect();
@@ -19,6 +23,18 @@ app.use(
     tempFileDir: "/tmp",
   })
 );
+
+const server = app.listen(PORT, (req,res) => {
+    console.log(`App is running at ${PORT}`)
+});
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+  },
+})
+
+global.onlineUsers = new Map();
 
 
 // //cloudinary connection
@@ -55,6 +71,7 @@ const profileRoutes = require("./routes/Profile")
 app.use("/api/v1/auth", userRoutes)
 app.use("/api/v1/case", caseRoutes)
 app.use("/api/v1/profile",profileRoutes)
+app.use("/api/v1/message", messageRoutes)
 
 
 //default route
@@ -66,8 +83,9 @@ app.get("/contact", (req,res) => {
     res.send("<h1>This is contact page</h1>")
 })
 
+io.on("connection", (socket) => {
+  global.chatSocket = socket;
+  console.log("A user connected ", socket.id);
 
-//activate server
-app.listen(PORT, () => {
-    console.log(`App is running at ${PORT}`)
+
 })

@@ -89,12 +89,7 @@ export default function Signup() {
         }),
       });
 
-      console.log('Signup response1 :', response);
-
-
       const data = await response.json();
-
-      console.log('Signup response 2:', data);
       
       if (data.success) {
         toast.success('Signup successful!');

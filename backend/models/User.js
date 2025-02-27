@@ -71,7 +71,21 @@ const userSchema = new mongoose.Schema ({
             type: mongoose.Schema.Types.ObjectId,
             ref: "RatingAndReview"
         }
-    ]
+    ],
+    sentMessages: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Message",
+          default: []
+        },
+      ],
+      receivedMessages: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Message",
+          default: []
+        },
+      ],
 })
 
 module.exports = mongoose.model("User", userSchema)
