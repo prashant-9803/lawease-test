@@ -3,9 +3,15 @@ import  { createSlice } from "@reduxjs/toolkit"
 const initialState = {
   signupData: null,
   loading: false,
-  token: localStorage.getItem("token")
-    ? JSON.parse(localStorage.getItem("token"))
-    : null,
+  token: (() => {
+    const token = localStorage.getItem("token");
+    try {
+      return token ? JSON.parse(token) : null;
+    } catch (e) {
+      console.error("Invalid token format:", e);
+      return null; // Return null if parsing fails
+    }
+  })(),
 };
 
 const authSlice = createSlice({
@@ -20,6 +26,7 @@ const authSlice = createSlice({
     },
     setToken(state, value) {
       state.token = value.payload;
+      localStorage.setItem("token", JSON.stringify(value.payload));
     },
   },
 });

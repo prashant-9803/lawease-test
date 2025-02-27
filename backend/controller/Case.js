@@ -304,6 +304,85 @@ exports.getAllPendingCases = async(req,res) => {
     }
 }
 
+exports.getAllCasesWithClients = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const userRole = req.user.accountType;
+        
+        // Find the user with their cases
+        const user = await User.findById(userId)
+            .populate({
+                path: 'cases',
+                populate: [
+                    {
+                        path: 'serviceProvider',
+                        select: 'firstName lastName email additionalDetails',
+                        populate: {
+                            path: 'additionalDetails',
+                            select: 'contactNumber'
+                        }
+                    },
+                    {
+                        path: 'caseMilestones'
+                    }
+                ]
+            });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        // For provider: Get client details for each case
+        if (userRole === "Provider") {
+            // This will hold cases with client information
+            const casesWithClientInfo = [];
+            
+            // For each case in the provider's cases
+            for (const caseItem of user.cases) {
+                // Find clients who have this case in their cases array
+                const client = await User.findOne({
+                    cases: caseItem._id,
+                    accountType: "Client"
+                }).select('firstName lastName email additionalDetails')
+                .populate('additionalDetails', 'contactNumber');
+
+                if (client) {
+                    // Create a new object with case and client information
+                    casesWithClientInfo.push({
+                        ...caseItem.toObject(),
+                        clientName: `${client.firstName} ${client.lastName}`,
+                        clientEmail: client.email,
+                        clientContact: client.additionalDetails?.contactNumber || "No contact provided"
+                    });
+                }
+            }
+
+            return res.status(200).json({
+                success: true,
+                data: casesWithClientInfo,
+                message: "All cases with client information retrieved successfully"
+            });
+        }
+        
+        // For client: Return their cases with provider details
+        return res.status(200).json({
+            success: true,
+            data: user.cases,
+            message: "All cases retrieved successfully"
+        });
+
+    } catch (error) {
+        console.error("Error in getAllCasesWithClients:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch cases",
+            error: error.message
+        });
+    }
+};
 // Update case status
 exports.updateCaseStatus = async (req, res) => {
     try {

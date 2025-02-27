@@ -9,11 +9,13 @@ import Providers from "./pages/Providers";
 import Leaderboard from "./pages/Leaderboard";
 import Home from "./pages/Home";
 import Form from "./pages/Form";
+import YourCase from "./myComponents/Dashboard/YourCase/YourCase";
 import { toast, Toaster } from 'sonner'
 import CaseCreation from "./pages/CaseCreation";
 import AcceptCase from "./pages/AcceptCase";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import PrivateRoute from './pages/PrivateRoute';
+import PendingCase from "./myComponents/Dashboard/PendingCase/PendingCase";
 // import CaseCreation from "./pages/1";
 // import CaseCreation2 from "./pages/0";
 
@@ -50,11 +52,20 @@ function App() {
                 <AcceptCase />
               </PrivateRoute>
             } />
-
+            <Route path="/pending-cases" element={
+              <PrivateRoute roleRequired="Provider">
+                <PendingCase />
+              </PrivateRoute>
+            } />
             {/* Protected Routes (any authenticated user) */}
             <Route path="/dashboard" element={
               <PrivateRoute>
                 <Dashboard />
+              </PrivateRoute>
+            } />
+            <Route path="/your-case" element={
+              <PrivateRoute>
+                <YourCase />
               </PrivateRoute>
             } />
           </Routes>

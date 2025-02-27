@@ -8,7 +8,8 @@ const {
     isCaseCreated,
     rejectCase,
     getAllCases,
-    getAllPendingCases
+    getAllPendingCases,
+    getAllCasesWithClients
 } = require("../controller/Case")
 const { isClient, auth, isProvider } = require("../middleware/auth")
 
@@ -28,6 +29,6 @@ router.get("/getAllCases", auth, getAllCases)
 
 router.get("/getAllPendingCases", auth, getAllPendingCases)
 
-
+router.get("/getAllCasesWithClients", auth, getAllCasesWithClients);  // change or remove if double
 
 module.exports = router
