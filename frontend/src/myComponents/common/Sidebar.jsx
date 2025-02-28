@@ -14,6 +14,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { useSelector } from 'react-redux';
+import { NavLink } from 'react-router-dom';
 
 const SidebarCol = () => {
 
@@ -45,66 +46,55 @@ const SidebarCol = () => {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <a href="#">
+              <NavLink to="/dashboard/analytics" className="flex items-center gap-2">
                   <Home className="mr-2 size-4" />
-                  Dashboard
-                </a>
+                  Analytics
+                  </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <a href="#">
+              <NavLink to="/dashboard/your-case" className="flex items-center gap-2">
                   <FileText className="mr-2 size-4" />
                   Your Case
-                </a>
+                  </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <a href="#">
-                  <Users className="mr-2 size-4" />
+              <NavLink to="/dashboard/pending-cases" className="flex items-center gap-2"><Users className="mr-2 size-4" />
                   Pending Cases
-                </a>
+                  </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <a href="#">
-                  <MessageSquare className="mr-2 size-4" />
-                  Chat
-                </a>
+              <NavLink to="/dashboard/chat" className="flex items-center gap-2">
+                <MessageSquare className="mr-2 size-4" /> Chat
+              </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <a href="#">
-                  <BarChart3 className="mr-2 size-4" />
+              <NavLink to="/dashboard/payment-history" className="flex items-center gap-2">                  <BarChart3 className="mr-2 size-4" />
                   Payment History
-                </a>
+                  </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <a href="#">
+              <NavLink to="/dashboard/payments" className="flex items-center gap-2">
                   <PieChart className="mr-2 size-4" />
                   Payments
-                </a>
+                  </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <a href="#">
-                  <Calendar className="mr-2 size-4" />
-                  Appointments
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <a href="#">
+              <NavLink to="/dashboard/settings" className="flex items-center gap-2">
                   <Settings className="mr-2 size-4" />
                   Settings
-                </a>
+                  </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
