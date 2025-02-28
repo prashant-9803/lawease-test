@@ -53,7 +53,7 @@ const SidebarCol = () => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="#" onClick={() => navigate('/your-case')}>
+                  <a href="#" onClick={() => navigate('/dashboard/your-case')}>
                     <FileText className="mr-2 size-4" />
                     Your Case
                   </a>
@@ -62,7 +62,7 @@ const SidebarCol = () => {
               {accountType === "Provider" && (
   <SidebarMenuItem>
     <SidebarMenuButton asChild>
-      <a href="#" onClick={() => navigate('/pending-cases')}>
+      <a href="#" onClick={() => navigate('/dashboard/pending-cases')}>
         <Inbox className="mr-2 size-4" />
         Pending Cases
       </a>
