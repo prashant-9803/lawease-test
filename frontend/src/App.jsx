@@ -52,22 +52,23 @@ function App() {
                 <AcceptCase />
               </PrivateRoute>
             } />
-            <Route path="/pending-cases" element={
-              <PrivateRoute roleRequired="Provider">
-                <PendingCase />
-              </PrivateRoute>
-            } />
             {/* Protected Routes (any authenticated user) */}
             <Route path="/dashboard" element={
               <PrivateRoute>
                 <Dashboard />
               </PrivateRoute>
-            } />
-            <Route path="/your-case" element={
+            }>
+              <Route path="your-case" element={
               <PrivateRoute>
                 <YourCase />
               </PrivateRoute>
             } />
+            <Route path="pending-cases" element={
+              <PrivateRoute roleRequired="Provider">
+                <PendingCase />
+              </PrivateRoute>
+            } />
+            </Route>
           </Routes>
         </main>
         <Toaster />
