@@ -20,6 +20,7 @@ const authSlice = createSlice({
     },
     setToken(state, value) {
       state.token = value.payload;
+      localStorage.setItem("token", JSON.stringify(value.payload));
     },
   },
 });

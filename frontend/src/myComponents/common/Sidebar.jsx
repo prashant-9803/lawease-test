@@ -1,6 +1,5 @@
 import React from 'react';
-import { BarChart3, BookOpen, Calendar, FileText, Home, MessageSquare, PieChart, Settings, Users } from 'lucide-react';
-
+import { BarChart3, BookOpen, Calendar, FileText, Home, MessageSquare, PieChart, Settings, Users, Inbox } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -14,12 +13,13 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 
 const SidebarCol = () => {
-
-  const {user} = useSelector((state) => state.profile);
-  const {firstName, lastName, accountType} = user;
+  const navigate = useNavigate(); // Initialize the navigate function
+  const { user } = useSelector((state) => state.profile);
+  const { firstName, lastName, accountType } = user;
 
   return (
     <div>
