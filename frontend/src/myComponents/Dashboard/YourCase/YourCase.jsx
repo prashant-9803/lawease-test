@@ -58,9 +58,9 @@ const YourCase = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {cases.map((caseItem) => (
+          {cases.map((caseItem, index) => (
             <div 
-              key={caseItem._id} 
+              key={index} 
               className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow"
               onClick={() => handleCardClick(caseItem)}
             >
