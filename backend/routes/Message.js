@@ -1,11 +1,15 @@
-const { addMessage, getMessages, addImageMessage, getInitialContactsWithMessages } = require("../controller/Message");
+const { addMessage, getMessages, addImageMessage, getInitialContactsWithMessages, getAllClients } = require("../controller/Message");
+
+const {auth} = require("../middleware/auth");
 
 const router = require("express").Router();
 
-router.post("/add-message", addMessage)
-router.get("/get-messages/:from/:to", getMessages)
-router.post("/add-image-message", addImageMessage)
-router.get("/get-initial-contacts/:from", getInitialContactsWithMessages)
+router.get("/get-clients",auth,getAllClients)
+
+router.post("/add-message",auth, addMessage)
+router.get("/get-messages/:from/:to",auth, getMessages)
+router.post("/add-image-message", auth,addImageMessage)
+router.get("/get-initial-contacts/:from", auth,getInitialContactsWithMessages)
 
 
 

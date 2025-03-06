@@ -10,6 +10,7 @@ const YourCase = () => {
   const [showDocViewer, setShowDocViewer] = useState(false);
   const [currentDocUrl, setCurrentDocUrl] = useState('');
   const token = useSelector((state) => state.auth.token);
+  console.log("token from your case", token);
   const accountType = useSelector((state) => state.profile.user?.accountType);
 
   useEffect(() => {

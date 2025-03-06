@@ -36,37 +36,7 @@ export default function ChatContainer() {
   return (
     <ScrollArea className="flex-1 p-4 bg-gray-50 dark:bg-gray-950">
       <div className="space-y-4">
-        {messages.length === 0 ? (
-          <>
-            <div className="flex justify-start animate-slide-in-left">
-              <div className="bg-white dark:bg-gray-900 rounded-lg p-3 max-w-[80%] shadow-sm border border-gray-200 dark:border-gray-800">
-                <p className="text-black dark:text-white">Hi there! How can I help you today?</p>
-                <div className="flex items-center justify-end mt-1 gap-1">
-                  <span className="text-xs text-gray-500">10:30 AM</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-end animate-slide-in-right">
-              <div className="bg-black dark:bg-white rounded-lg p-3 max-w-[80%] shadow-sm">
-                <p className="text-white dark:text-black">Hey! I'm looking for some information about your services.</p>
-                <div className="flex items-center justify-end mt-1 gap-1">
-                  <span className="text-xs text-gray-300 dark:text-gray-700">10:32 AM</span>
-                  {renderMessageStatus("read")}
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-start animate-slide-in-left">
-              <div className="bg-white dark:bg-gray-900 rounded-lg p-3 max-w-[80%] shadow-sm border border-gray-200 dark:border-gray-800">
-                <p className="text-black dark:text-white">
-                  Of course! I'd be happy to tell you about our services. What specifically are you interested in?
-                </p>
-                <div className="flex items-center justify-end mt-1 gap-1">
-                  <span className="text-xs text-gray-500">10:33 AM</span>
-                </div>
-              </div>
-            </div>
-          </>
-        ) : (
+        {messages && (
           messages.map((message, index) => (
             <div
               key={message.id}
@@ -84,7 +54,7 @@ export default function ChatContainer() {
                     : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-200 dark:border-gray-800"
                 }`}
               >
-                <p>{message.content}</p>
+                <p>messageContent</p>
                 <div className="flex items-center justify-end mt-1 gap-1">
                   <span
                     className={`text-xs ${

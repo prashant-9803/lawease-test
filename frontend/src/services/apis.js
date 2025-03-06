@@ -7,7 +7,6 @@ export const endpoints = {
     SIGNUP_API: BASE_URL + "/auth/signup",
     SENDOTP_API: BASE_URL + "/auth/sendotp",
     GOOGLE_AUTH_API: BASE_URL+"/auth/google",
-
 }
 
 export const caseEndpoints = {
@@ -21,5 +20,10 @@ export const caseEndpoints = {
 
 export const profileEndpoints = {
     GET_MATCHED_PROVIDERS_API : BASE_URL + "/profile/getMatchedProviders"
+}
+
+export const chatEndpoints = {
+    GET_ALL_CLIENTS_API : BASE_URL + "/message/get-clients",
+    GET_INITIAL_CONTACTS_ROUTE: BASE_URL + "/message/get-initial-contacts/",
 }
 

@@ -16,11 +16,11 @@ function Dashboard() {
   }
 
   return (
-    <div className="relative flex mt-16]">
+    <div className="relative flex">
       <SidebarCol />
 
-      <div className="mt-16 flex-1 overflow-auto">
-        <div className="mx-auto w-11/12 max-w-[1000px] py-10">
+      <div className="mt-16 flex-1 overflow-auto items-center justify-center flex">
+        <div className="mx-auto w-11/12 max-w-[1000px] h-[90%]">
           <Outlet />
           
         </div>

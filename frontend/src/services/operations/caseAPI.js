@@ -37,6 +37,8 @@ export const createCase = async(token, formData, navigate) => {
         toast.dismiss(toastId);
     }
 }
+
+
 export const getAllCasesWithClients = async (token) => {
     const toastId = toast.loading("Loading...");
     let result = [];

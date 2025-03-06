@@ -1,5 +1,6 @@
 const Message = require("../models/Message");
 const User = require("../models/User");
+const Case = require("../models/Case");
 const { uploadToCloudinary } = require("../utils/uploadToCloudinary");
 
 exports.addMessage = async (req, res) => {
@@ -251,3 +252,50 @@ exports.getInitialContactsWithMessages = async (req, res) => {
     });
   }
 };
+
+exports.getAllClients = async (req, res) => {
+  console.log("getAllClients");
+  try {
+    console.log("before")
+    const userId = req.user.id;
+    console.log("after")
+
+    console.log("user: ", userId)
+    // Find the user and populate their cases
+    const userCases = await User.findById(userId).populate('cases'); 
+    
+    //retrive caseId only
+    const caseIds = userCases.cases.map((caseItem) => caseItem._id);
+
+    //find such users whos role is client and contains any of these cases
+    const clients = await User.find({
+      cases: { $in: caseIds },
+      _id: { $ne: userId }
+    });
+
+    const usersGrupedByInitialLetter = {}
+
+    clients.forEach(client => {
+      const initialLetter = client.firstName.charAt(0).toUpperCase();
+      if (usersGrupedByInitialLetter[initialLetter]) {
+        usersGrupedByInitialLetter[initialLetter].push(client)
+      } else {
+        usersGrupedByInitialLetter[initialLetter] = [client]
+      }
+    })
+
+    //return the clients
+    res.status(200).json({
+      success: true,
+      result: "Clients fetched successfully",
+      users: usersGrupedByInitialLetter,
+    });
+
+  }
+  catch(error) {
+    res.status(500).json({
+      success: false,
+      error: "Something went wrong while getting all clients",
+    });
+  }
+}
