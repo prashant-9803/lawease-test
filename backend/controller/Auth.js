@@ -223,10 +223,22 @@ exports.signup = async (req, res) => {
     });
     console.log("user: ", user);
 
+
+    const payload = {
+      email: user.email,
+      id: user._id,
+      accountType: user.accountType,
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "2hr",
+    });
+
     res.status(200).json({
       success: true,
       message: "User is registered successfully",
       data: user,
+      token,
     });
   } catch (error) {
     console.log(error);

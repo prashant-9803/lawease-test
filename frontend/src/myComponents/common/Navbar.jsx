@@ -27,7 +27,8 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    socket.current.emit("signout", user?._id);
+    // TODO
+    // socket.current.emit("signout", user?._id);
     dispatch(logout(navigate));
   }
   

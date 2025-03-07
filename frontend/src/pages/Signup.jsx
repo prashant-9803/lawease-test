@@ -8,6 +8,8 @@ import { toast } from 'sonner'
 import { GoogleLogin } from '@react-oauth/google';
 import { useDispatch } from 'react-redux';
 import { googleAuth } from '@/services/operations/authAPI';
+import { setUser } from '@/slices/profileSlice'
+import { setToken } from '@/slices/authSlice'
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -90,7 +92,7 @@ export default function Signup() {
       });
 
       const data = await response.json();
-      
+      console.log("data from signup: ", data);
       if (data.success) {
         toast.success('Signup successful!');
         if (accountType === 'Provider') {
@@ -98,6 +100,9 @@ export default function Signup() {
           if (data.token) {
             // Store the token without JSON.stringify
             localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.data));
+            setToken(data.token);
+            setUser(data.data);
             console.log('Token saved:', data.token); // Debug log
             navigate('/form');
           } else {
