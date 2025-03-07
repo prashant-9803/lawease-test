@@ -29,7 +29,7 @@ const ChatSidebarHeader = () => {
           </Avatar>
           <div>
             <h1 className="font-semibold text-md text-black dark:text-white">{user?.firstName} {user?.lastName}</h1>
-            <p className="text-xs text-green-500">online</p>
+            <p className="text-xs text-green-500">Online</p>
           </div>
         </div>
         <div className="flex gap-1">
