@@ -20,7 +20,7 @@ export default function ChatSidebar() {
   }, [contactsPage]);
 
   return (
-    <div className="w-80 border-e border-gray-200 dark:border-gray-800 bg-white dark:bg-black flex flex-col transition-all duration-300 ease-in-out">
+    <div className="min-w-80 border-e border-gray-200 dark:border-gray-800 bg-white dark:bg-black flex flex-col transition-all duration-300 ease-in-out">
       {pageType === "default" && (
         <>
           <ChatSidebarHeader />

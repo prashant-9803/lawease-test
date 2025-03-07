@@ -95,6 +95,11 @@ exports.addImageMessage = async (req, res) => {
   try {
     const { from, to } = req.query;
 
+    console.log("from: ", from);
+    console.log("to: ", to);
+
+    console.log("req.files: ", req);
+
     if (req.files) {
       console.log(req.files.file);
       const date = Date.now();

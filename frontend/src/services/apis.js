@@ -25,5 +25,8 @@ export const profileEndpoints = {
 export const chatEndpoints = {
     GET_ALL_CLIENTS_API : BASE_URL + "/message/get-clients",
     GET_INITIAL_CONTACTS_ROUTE: BASE_URL + "/message/get-initial-contacts/",
+    GET_MESSAGES_ROUTE: BASE_URL + "/message/get-messages",
+    ADD_MESSAGE_ROUTE: BASE_URL + "/message/add-message",
+    ADD_IMAGE_MESSAGE_ROUTE: BASE_URL + "/message/add-image-message",
 }
 

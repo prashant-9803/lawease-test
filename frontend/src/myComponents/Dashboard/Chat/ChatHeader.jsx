@@ -1,25 +1,29 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Phone, Video, MoreVertical } from "lucide-react"
+import { useDispatch, useSelector } from "react-redux"
 
 export default function ChatHeader() {
+
+  const {currentChatUser, onlineUsers} = useSelector(state => state.chat)
+  const dispatch = useDispatch()
+  
+
   return (
     <div className="p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-black flex items-center justify-between transition-all duration-300 ease-in-out">
       <div className="flex items-center gap-3">
         <Avatar 
         // className={`${contact?.status === "online" ? "animate-pulse-slow" : ""} animate-subtle-shine`}
         >
-          <AvatarImage  alt={"contactavatar"} />
+          <AvatarImage src={currentChatUser?.image}  alt={"contactavatar"} />
           <AvatarFallback>
-            {/* {contact?.name
-              ?.split(" ")
-              .map((n) => n[0])
-              .join("")} */}
-              contactName
+          
+              {currentChatUser?.firstName} {currentChatUser?.lastName}
           </AvatarFallback>
         </Avatar>
         <div className="animate-fade-in">
-          <h2 className="font-semibold text-black dark:text-white">contactname</h2>
+          <h2 className="font-semibold text-black dark:text-white">              {currentChatUser?.firstName} {currentChatUser?.lastName}
+          </h2>
           <p >
             online
           </p>
