@@ -64,7 +64,8 @@ export default function MessageInput() {
       })
     );
 
-    setMessage("");  };
+    setMessage("");  
+  };
 
   // Handle file selection
   const handleFileChange = (e) => {
@@ -81,6 +82,10 @@ export default function MessageInput() {
       reader.readAsDataURL(file);
 
       console.log("Image preview URL:", imagePreviewUrl);
+    }
+    else {
+      setSelectedImage(file)
+      onSubmit(e)
     }
   };
 
@@ -128,7 +133,7 @@ export default function MessageInput() {
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
-        accept="image/*"
+        accept="image/*,.pdf"
         className="hidden"
       />
 
