@@ -15,6 +15,8 @@ export default function ChatSidebar() {
 
   const [pageType, setPageType] = useState("default");
 
+
+
   useEffect(() => {
     setPageType(contactsPage ? "all-contacts" : "default");
   }, [contactsPage]);

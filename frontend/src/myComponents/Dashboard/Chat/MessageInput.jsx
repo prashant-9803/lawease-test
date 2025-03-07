@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Smile, Paperclip, Mic, SendHorizontal, X } from "lucide-react";
@@ -6,9 +6,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { sendMessage } from "@/services/operations/chatAPI";
 import { addMessage } from "@/slices/chatSlice";
 import { sendImageMessage } from "@/services/operations/chatAPI";
+import { SocketContext } from "@/context/SocketContext";
+import PdfMessage from "./PdfMessage";
+import { toast } from "sonner";
 
 export default function MessageInput() {
-  const [isRecording, setIsRecording] = useState(false);
+
   const [isFocused, setIsFocused] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -17,14 +20,28 @@ export default function MessageInput() {
   const { token } = useSelector((state) => state.auth);
   const { currentChatUser } = useSelector((state) => state.chat);
   const dispatch = useDispatch();
+  const [isFile, setIsFile] = useState(false)
 
   const fileInputRef = useRef(null);
   const [message, setMessage] = useState("");
 
+  const {socket} = useContext(SocketContext)
+
   const photoPickerChange = async () => {
+    console.log("in the photopickerchange");
     const res = await sendImageMessage(token, selectedImage, user._id, currentChatUser._id);
     if (res.success) {
+
+      socket.current.emit("send-msg", {
+        from: user?._id,
+        to: currentChatUser?._id,
+        message: res.message,
+      });
+
+
       console.log(res.data);
+
+      
       dispatch(
         addMessage({
           ...res.message,
@@ -34,6 +51,8 @@ export default function MessageInput() {
     }
     setSelectedImage(null);
     setImagePreviewUrl("");
+    setIsFile(false) 
+
     fileInputRef.current.value = "";
   };
 
@@ -41,22 +60,36 @@ export default function MessageInput() {
   const removeSelectedImage = () => {
     setSelectedImage(null);
     setImagePreviewUrl("");
+    setIsFile(false)
     fileInputRef.current.value = "";
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    console.log("in the onsubmit");
+    if(!selectedImage && message.trim() === "") {
+      return
+    }
     if (selectedImage) {
+      console.log("selectedImage: ", selectedImage);
       photoPickerChange();
       return;
     }
-    console.log("Message: ", message);
+    console.log("trying to send text message")
     const data = await sendMessage(token, {
       from: user._id,
       to: currentChatUser._id,
       message,
     });
-    console.log("Data: ", data);
+
+    console.log("data to put in socket: ", data);
+
+    socket.current.emit("send-msg", {
+      from: user?._id,
+      to: currentChatUser?._id,
+      message: data.message,
+    });
+
     dispatch(
       addMessage({
         ...data.message,
@@ -64,13 +97,15 @@ export default function MessageInput() {
       })
     );
 
-    setMessage("");  
+    setMessage(""); 
   };
 
   // Handle file selection
   const handleFileChange = (e) => {
+    e.preventDefault();
     console.log("File selected:", e.target.files[0]);
     const file = e.target.files[0];
+    console.log("file ", file)
     if (file && file.type.startsWith("image/")) {
       setSelectedImage(file);
 
@@ -85,6 +120,7 @@ export default function MessageInput() {
     }
     else {
       setSelectedImage(file)
+      setIsFile(true)
       onSubmit(e)
     }
   };
@@ -127,6 +163,25 @@ export default function MessageInput() {
           </div>
         </div>
       )}
+
+      {
+        isFile && (
+          <div className="mb-3 relative animate-slide-in-left">
+            <div className="relative inline-block">
+              <PdfMessage file={selectedImage} />
+              <Button
+                type="button"
+                size="icon"
+                variant="destructive"
+                className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                onClick={removeSelectedImage}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )
+      }
 
       {/* Hidden file input */}
       <input

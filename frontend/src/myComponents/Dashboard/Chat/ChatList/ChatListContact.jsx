@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { setContactsPage, setCurrentChatUser } from "@/slices/chatSlice";
 import { calculateTime } from "@/utils/CalculateTime";
-import { Camera, Mic } from "lucide-react";
+import { Camera, File, Mic } from "lucide-react";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -20,25 +20,19 @@ const ChatListContact = ({ data }) => {
     <div className="p-2">
       <button
         className={`w-full flex items-center gap-3 p-3 rounded-lg text-left mb-1 transition-all duration-100  transform hover:scale-[1.02] 
-            dark:bg-gray-900"  hover:bg-gray-50 dark:hover:bg-gray-950`}
+            dark:bg-gray-900"  hover:bg-gray-50 dark:hover:bg-gray-950 ${currentChatUser?._id === data?._doc?._id ? "bg-gray-100" : "bg-white"}`}
         onClick={handleContactClick}
       >
         <div className="relative">
           <Avatar
-          // className={contact.status === "online" ? "animate-pulse-slow" : ""}
           >
             <AvatarImage src={data?._doc?.image} alt={"contactaAvatar"} />
             <AvatarFallback>
-              {/* {contact.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")} */}
+            
               {data?._doc?.firstName} {data?._doc?.lastName}
             </AvatarFallback>
           </Avatar>
-          {/* {contact.status === "online" && (
-              <span className="absolute bottom-0 right-0 size-3 bg-green-500 border-2 border-white dark:border-black rounded-full"></span>
-            )} */}
+         
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-baseline">
@@ -64,6 +58,12 @@ const ChatListContact = ({ data }) => {
                 <span className="flex items-center">
                   <Camera height={18} />
                   Image
+                </span>
+              )}
+              {data?.type === "file" && (
+                <span className="flex items-center">
+                  <File  height={18} />
+                  Document
                 </span>
               )}
             </p>

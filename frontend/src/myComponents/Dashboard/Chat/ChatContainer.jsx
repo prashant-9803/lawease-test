@@ -64,13 +64,15 @@ export default function ChatContainer() {
                   <p className="w-full text-wrap">{message.message}</p>
                 )}
                 {message.type == "image" && (
-                  <img
+                  <a href={message.message} target="_blank">
+                    <img
                     src={message.message}
                     alt={message.message}
                     height={200}
                     width={200}
                     className="mb-2"
                   />
+                  </a>
                 )}
                 {/* Sample PDF message */}
                 {message.type == "file" && (

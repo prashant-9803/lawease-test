@@ -14,13 +14,22 @@ import { toast } from "sonner";
 import Logo from "../../assets/logoImg.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/services/operations/authAPI";
+import { useContext } from "react";
+import { SocketContext } from "@/context/SocketContext";
 
 
 export default function Navbar() {
 
   const { token } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.profile);
+  const {socket} = useContext(SocketContext)
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    socket.current.emit("signout", user?._id);
+    dispatch(logout(navigate));
+  }
   
 
   return (
@@ -79,7 +88,7 @@ export default function Navbar() {
           </NavLink>
           ) : (
             <div className="hidden md:block">
-              <Button onClick={() => dispatch(logout(navigate))} variant="outline" className="ml-4 bg-primary-foreground ">
+              <Button onClick={handleLogout} variant="outline" className="ml-4 bg-primary-foreground ">
               Logout<LogOut/>
               </Button>
             </div>
