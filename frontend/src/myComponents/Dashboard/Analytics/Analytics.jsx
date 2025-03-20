@@ -1,8 +1,11 @@
 import React from 'react'
+import LawyerDashboard from './LawyerDashboard'
 
 const Analytics = () => {
   return (
-    <div>Analytics</div>
+    <div>
+      <LawyerDashboard/>
+    </div>
   )
 }
 
