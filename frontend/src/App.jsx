@@ -19,6 +19,7 @@ import PendingCase from "./myComponents/Dashboard/PendingCase/PendingCase";
 import Chat from "./myComponents/Dashboard/Chat/Chat";
 import PaymentHistory from "./myComponents/Dashboard/PaymentHistory/PaymentHistory";
 import Analytics from "./myComponents/Dashboard/Analytics/Analytics";
+import CaseYour from "./myComponents/Dashboard/YourCase/CaseYour";
 // import CaseCreation from "./pages/1";
 // import CaseCreation2 from "./pages/0";
 
@@ -75,7 +76,8 @@ function App() {
                 path="your-case"
                 element={
                   <PrivateRoute>
-                    <YourCase />
+                    {/* <YourCase /> */}
+                    <CaseYour/>
                   </PrivateRoute>
                 }
               />
@@ -107,7 +109,7 @@ function App() {
               />
 
               <Route
-                path="analytics"
+                path=""
                 element={
                   <PrivateRoute>
                     <Analytics />
