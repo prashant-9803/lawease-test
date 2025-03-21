@@ -8,7 +8,7 @@ const { setProfile, getMatchedProviders } = require("../controller/Profile");
 //set profile (provider only)
 router.post("/setprofile", auth, isProvider, setProfile)
 
-router.get("/getMatchedProviders", getMatchedProviders)
+router.post("/getMatchedProviders", getMatchedProviders)
 
 
 module.exports = router
