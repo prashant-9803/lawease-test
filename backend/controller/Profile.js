@@ -147,8 +147,12 @@ exports.setProfile = async(req,res) => {
 //TODO: here we are accesssing all providers for now
 exports.getMatchedProviders = async(req,res) => {
   try {
-    //get all providers
-    const providers = await User.find({ accountType: "Provider" }).populate("additionalDetails")  
+    //api call to python 
+
+    //get category
+
+    //get top 3 providers from that category 
+    const providers = await User.find({ accountType: "Provider",}).populate("additionalDetails")  
 
     return res.status(200).json({
       success: true,

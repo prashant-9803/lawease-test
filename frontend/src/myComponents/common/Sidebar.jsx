@@ -46,7 +46,7 @@ const SidebarCol = () => {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-              <NavLink to="/dashboard/analytics" className="flex items-center gap-2">
+              <NavLink to="/dashboard" className="flex items-center gap-2">
                   <Home className="mr-2 size-4" />
                   Analytics
                   </NavLink>

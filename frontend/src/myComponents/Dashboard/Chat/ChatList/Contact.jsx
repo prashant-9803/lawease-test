@@ -1,13 +1,27 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { setContactsPage, setCurrentChatUser } from "@/slices/chatSlice";
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const Contact = ({ data }) => {
+
+  const { currentChatUser } = useSelector((state) => state.chat);
+  const dispatch = useDispatch()
+
+  const handleContactClick = () => {
+    console.log("data: ", data);
+    dispatch(setCurrentChatUser(data));
+    console.log("current chat user: ", data);
+    dispatch(setContactsPage(false));
+  };
+
+
   return (
     <div className="px-1">
       <button
         className={`w-full flex items-center gap-3 p-3 rounded-lg text-left mb-1 transition-all duration-100  transform hover:scale-[1.02] 
                  dark:bg-gray-900"  hover:bg-gray-50 dark:hover:bg-gray-950`}
-        //   onClick={() => setActiveChatId(contact.id)}
+          onClick={handleContactClick}
       >
         <div className="relative">
           <Avatar
