@@ -141,6 +141,12 @@ const LawyerProfileForm = () => {
         throw new Error('Profile picture is required');
       }
   
+      // Validate enrollment number
+      // You can add regex validation or other checks here
+      if (formData.enrollmentNumber.length < 5) {
+        throw new Error('Please enter a valid enrollment number');
+      }
+  
       // Create FormData instance
       const formDataToSend = new FormData();
       formDataToSend.append('image', profilePic);
@@ -150,6 +156,23 @@ const LawyerProfileForm = () => {
         formDataToSend.append(key, formData[key]);
       });
   
+      // First verify enrollment number if needed
+      const verifyResponse = await fetch(`${import.meta.env.VITE_BASE_URL}/profile/verifyEnrollment`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ enrollmentNumber: formData.enrollmentNumber }),
+      });
+  
+      const verifyData = await verifyResponse.json();
+      
+      if (!verifyData.success) {
+        throw new Error(verifyData.message || 'Invalid enrollment number. You are not authorized to access the system.');
+      }
+  
+      // If enrollment is valid, submit the form
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}/profile/setProfile`, {
         method: 'POST',
         headers: {
@@ -198,175 +221,188 @@ const LawyerProfileForm = () => {
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto mt-16">
-      <CardHeader>
-        <CardTitle>Update Lawyer Profile</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label>Profile Picture</Label>
-            <Input 
-              type="file" 
-              accept="image/*"
-              onChange={handleFileChange}
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Gender</Label>
-              <Select 
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">Complete Your Profile</h1>
+      
+      <form onSubmit={handleSubmit}>
+        {/* Basic Info */}
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-4">Personal Information</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-2">Gender</label>
+              <select
+                name="gender"
                 value={formData.gender}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, gender: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Category</Label>
-              <Select 
-                value={formData.category}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>About</Label>
-            <Textarea 
-              name="about"
-              value={formData.about}
-              onChange={handleInputChange}
-              placeholder="Tell us about yourself"
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Contact Number</Label>
-              <Input 
-                type="tel"
-                name="contactNumber"
-                value={formData.contactNumber}
                 onChange={handleInputChange}
+                className="w-full p-2 border rounded"
                 required
-              />
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
-
-            <div className="space-y-2">
-              <Label>Age</Label>
-              <Input 
+            
+            <div>
+              <label className="block mb-2">Age</label>
+              <input
                 type="number"
                 name="age"
                 value={formData.age}
                 onChange={handleInputChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            
+            <div>
+              <label className="block mb-2">Contact Number</label>
+              <input
+                type="tel"
+                name="contactNumber"
+                value={formData.contactNumber}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            
+            <div>
+              <label className="block mb-2">Profile Picture</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="w-full p-2 border rounded"
                 required
               />
             </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Experience (years)</Label>
-              <Input 
-                type="number"
-                name="experience"
-                value={formData.experience}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Enrollment Number</Label>
-              <Input 
-                type="text"
-                name="enrollmentNumber"
-                value={formData.enrollmentNumber}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label>District</Label>
-              <Input 
-                type="text"
-                name="district"
-                value={formData.district}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Taluka</Label>
-              <Input 
-                type="text"
-                name="taluka"
-                value={formData.taluka}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>State</Label>
-              <Input 
+        </div>
+        
+        {/* Location */}
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-4">Location</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block mb-2">State</label>
+              <input
                 type="text"
                 name="state"
                 value={formData.state}
                 onChange={handleInputChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            
+            <div>
+              <label className="block mb-2">District</label>
+              <input
+                type="text"
+                name="district"
+                value={formData.district}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            
+            <div>
+              <label className="block mb-2">Taluka</label>
+              <input
+                type="text"
+                name="taluka"
+                value={formData.taluka}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded"
                 required
               />
             </div>
           </div>
-
-          <div className="space-y-2">
-            <Label>University</Label>
-            <Input 
-              type="text"
-              name="university"
-              value={formData.university}
-              onChange={handleInputChange}
-              required
-            />
+        </div>
+        
+        {/* Professional Info */}
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-4">Professional Information</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-2">University</label>
+              <input
+                type="text"
+                name="university"
+                value={formData.university}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            
+            <div>
+              <label className="block mb-2">Experience (in years)</label>
+              <input
+                type="number"
+                name="experience"
+                value={formData.experience}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            
+            <div>
+              <label className="block mb-2">Category</label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded"
+                required
+              >
+                <option value="">Select Specialization</option>
+                {categories.map((cat, index) => (
+                  <option key={index} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label className="block mb-2">Enrollment Number</label>
+              <input
+                type="text"
+                name="enrollmentNumber"
+                value={formData.enrollmentNumber}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
           </div>
-
-          <Button 
-            type="submit" 
-            className="w-full"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Submitting...' : 'Submit'}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+        </div>
+        
+        <div className="mb-6">
+          <label className="block mb-2">About</label>
+          <textarea
+            name="about"
+            value={formData.about}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded"
+            rows="4"
+            required
+          ></textarea>
+        </div>
+        
+        <button
+          type="submit"
+          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Submitting...' : 'Submit Profile'}
+        </button>
+      </form>
+    </div>
   );
 };
 
