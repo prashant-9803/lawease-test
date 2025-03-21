@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart3, BookOpen, Calendar, FileText, Home, MessageSquare, PieChart, Settings, Users, Inbox } from 'lucide-react';
+import { BarChart3, BookOpen, Calendar, FileText, FileDigit ,Home, MessageSquare, PieChart, Settings, Users, Inbox } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 const SidebarCol = () => {
   const navigate = useNavigate(); // Initialize the navigate function
@@ -23,102 +24,96 @@ const SidebarCol = () => {
   return (
     <div>
       <SidebarProvider>
-        <Sidebar className="mt-14">
-          <SidebarHeader>
-            <SidebarMenu>
-              <SidebarMenuItem className='ml-6 mt-3'>
-                <SidebarMenuButton size="lg" asChild>
-                  <a href="#" className="flex items-center gap-2">
-                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                      <BookOpen className="size-4" />
-                    </div>
-                    <div className="flex flex-col gap-0.5 leading-none">
-                      <span className="font-semibold">{firstName} {lastName}</span>
-                      <span className="text-xs text-muted-foreground">{accountType}</span>
-                    </div>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarHeader>
-          <SidebarContent className='ml-6'>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#" onClick={() => navigate('/dashboard')}>
-                    <Home className="mr-2 size-4" />
-                    Dashboard
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#" onClick={() => navigate('/dashboard/your-case')}>
-                    <FileText className="mr-2 size-4" />
-                    Your Case
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              {accountType === "Provider" && (
-  <SidebarMenuItem>
-    <SidebarMenuButton asChild>
-      <a href="#" onClick={() => navigate('/dashboard/pending-cases')}>
-        <Inbox className="mr-2 size-4" />
-        Pending Cases
-      </a>
-    </SidebarMenuButton>
-  </SidebarMenuItem>
-)}
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#">
-                    <MessageSquare className="mr-2 size-4" />
-                    Chat
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#">
-                    <BarChart3 className="mr-2 size-4" />
-                    Payment History
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#">
-                    <PieChart className="mr-2 size-4" />
-                    Payments
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#">
-                    <Calendar className="mr-2 size-4" />
-                    Appointments
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#">
-                    <Settings className="mr-2 size-4" />
-                    Settings
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarContent>
-          <SidebarFooter>
-            <div className="flex items-center justify-center p-4">
-              <span className="text-xs text-muted-foreground">© 2024 LegalEase</span>
-            </div>
-          </SidebarFooter>
-          <SidebarRail />
-        </Sidebar>
-      </SidebarProvider>
+      <Sidebar className="mt-14">
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem className='ml-6 mt-3'>
+              <SidebarMenuButton size="lg" asChild>
+                <a href="#" className="flex items-center gap-2">
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                    <BookOpen className="size-4" />
+                  </div>
+                  <div className="flex flex-col gap-0.5 leading-none">
+                    <span className="font-semibold">{firstName} {lastName}</span>
+                    <span className="text-xs text-muted-foreground">{accountType}</span>
+                  </div>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
+        <SidebarContent className='ml-6'>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+              <NavLink to="/dashboard/analytics" className="flex items-center gap-2">
+                  <Home className="mr-2 size-4" />
+                  Analytics
+                  </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+              <NavLink to="/dashboard/your-case" className="flex items-center gap-2">
+                  <FileText className="mr-2 size-4" />
+                  Your Case
+                  </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+              <NavLink to="/dashboard/pending-cases" className="flex items-center gap-2"><Users className="mr-2 size-4" />
+                  Pending Cases
+                  </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+              <NavLink to="/dashboard/chat" className="flex items-center gap-2">
+                <MessageSquare className="mr-2 size-4" /> Chat
+              </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+              <NavLink to="/dashboard/pdf-summary" className="flex items-center gap-2">
+                <FileDigit className="mr-2 size-4" /> PDF Summary
+              </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+              <NavLink to="/dashboard/payment-history" className="flex items-center gap-2">                  <BarChart3 className="mr-2 size-4" />
+                  Payment History
+                  </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+              <NavLink to="/dashboard/payments" className="flex items-center gap-2">
+                  <PieChart className="mr-2 size-4" />
+                  Payments
+                  </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+              <NavLink to="/dashboard/settings" className="flex items-center gap-2">
+                  <Settings className="mr-2 size-4" />
+                  Settings
+                  </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarContent>
+        <SidebarFooter>
+          <div className="flex items-center justify-center p-4">
+            <span className="text-xs text-muted-foreground">© 2024 LegalEase</span>
+          </div>
+        </SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
+    </SidebarProvider>
     </div>
   );
 };
