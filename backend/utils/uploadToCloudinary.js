@@ -22,7 +22,7 @@ const cloudinary = require("cloudinary").v2
 exports.uploadToCloudinary = async (file, folder, height, quality, additionalOptions = {}) => {
   try {
     // Initialize default options
-    const options = { folder };
+    const options = { folder,use_filename: true ,Unique_filename: true};
     
     if (height) {
       options.height = height;
