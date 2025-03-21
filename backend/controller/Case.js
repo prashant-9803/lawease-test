@@ -431,3 +431,50 @@ exports.updateCaseStatus = async (req, res) => {
         });
     }
 };
+
+exports.uploadPdfForSummary = async(req, res) => {
+    try {
+        // Check if file exists
+        if(!req.files || !req.files.pdfFile) {
+            return res.status(400).json({
+                success: false,
+                message: "PDF file is required"
+            });
+        }
+
+        const pdfFile = req.files.pdfFile;
+        
+        // Upload PDF to cloudinary with options to preserve the original filename
+        const cloudinaryOptions = {
+            folder: 'documents',
+            use_filename: true,
+            unique_filename: false // This prevents appending random strings to the filename
+        };
+        
+        // Upload with the specified options
+        const uploadedPdf = await uploadToCloudinary(
+            pdfFile,
+            'documents', // folder
+            null, // height
+            null, // quality
+            cloudinaryOptions // Pass additional options
+        );
+        
+        console.log("Uploaded PDF:", uploadedPdf);
+
+        // Return success with URL
+        return res.status(200).json({
+            success: true,
+            pdfUrl: uploadedPdf.secure_url,
+            message: "PDF uploaded successfully"
+        });
+
+    } catch(error) {
+        console.error("Error in uploadPdfForSummary:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Error while uploading PDF",
+            error: error.message
+        });
+    }
+};

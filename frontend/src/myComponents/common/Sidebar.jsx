@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart3, BookOpen, Calendar, FileText, Home, MessageSquare, PieChart, Settings, Users, Inbox } from 'lucide-react';
+import { BarChart3, BookOpen, Calendar, FileText, FileDigit ,Home, MessageSquare, PieChart, Settings, Users, Inbox } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -71,6 +71,13 @@ const SidebarCol = () => {
               <SidebarMenuButton asChild>
               <NavLink to="/dashboard/chat" className="flex items-center gap-2">
                 <MessageSquare className="mr-2 size-4" /> Chat
+              </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+              <NavLink to="/dashboard/pdf-summary" className="flex items-center gap-2">
+                <FileDigit className="mr-2 size-4" /> PDF Summary
               </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>

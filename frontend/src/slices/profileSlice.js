@@ -1,8 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit"
 
-
 const initialState = {
-    user:localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null,
+    user: (() => {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            try {
+                return JSON.parse(storedUser);
+            } catch (error) {
+                console.error("Error parsing user data from localStorage:", error);
+                return null;
+            }
+        }
+        return null;
+    })(),
     loading: false
 }
 
@@ -13,7 +23,7 @@ const profileSlice = createSlice({
         setUser(state, value){
             state.user = value.payload
         },
-        setLoading (state, value) {
+        setLoading(state, value) {
             state.loading = value.payload
         }
     }

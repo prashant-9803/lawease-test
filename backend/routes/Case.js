@@ -9,7 +9,8 @@ const {
     rejectCase,
     getAllCases,
     getAllPendingCases,
-    getAllCasesWithClients
+    getAllCasesWithClients,
+    uploadPdfForSummary
 } = require("../controller/Case")
 const { isClient, auth, isProvider } = require("../middleware/auth")
 
@@ -30,5 +31,7 @@ router.get("/getAllCases", auth, getAllCases)
 router.get("/getAllPendingCases", auth, getAllPendingCases)
 
 router.get("/getAllCasesWithClients", auth, getAllCasesWithClients);  // change or remove if double
+
+router.post("/upload-pdf-summary", auth, uploadPdfForSummary);
 
 module.exports = router

@@ -17,6 +17,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import PrivateRoute from './pages/PrivateRoute';
 import PendingCase from "./myComponents/Dashboard/PendingCase/PendingCase";
 import Chat from "./myComponents/Dashboard/Chat/Chat";
+import PDFSummary from './myComponents/Dashboard/PdfSummary/PdfSummary';
 // import CaseCreation from "./pages/1";
 // import CaseCreation2 from "./pages/0";
 
@@ -73,6 +74,11 @@ function App() {
 <Route path="chat" element={
               <PrivateRoute>
                 <Chat />
+              </PrivateRoute>
+            } />
+            <Route path="pdf-summary" element={
+              <PrivateRoute>
+                <PDFSummary />
               </PrivateRoute>
             } />
             </Route>
