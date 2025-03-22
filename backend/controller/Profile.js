@@ -57,13 +57,15 @@ exports.setProfile = async(req,res) => {
       const capDistrict = district.toUpperCase()
       const capTaluka = taluka.toUpperCase()
       const BAR_COUNCIL_API = process.env.BAR_COUNCIL_API
-      const barName = `${capTaluka} TALUKA   BAR ASSOCIATION,   ${capDistrict}`
+      const barName = `${capTaluka} TALUKA   BAR ASSOCIATION,  ${capDistrict}`
         
       //fetch data from bar council
       try {
         //make form data
         const formData = new FormData();
         formData.append("barname", barName);
+
+        console.log("formData", formData)
         
         //make api call
         const response = await axios.post(
@@ -75,6 +77,8 @@ exports.setProfile = async(req,res) => {
                 }
             }
           );
+
+          console.log("response", response)
 
         //find if user is enrolled
         const advocateList = response.data || [];
