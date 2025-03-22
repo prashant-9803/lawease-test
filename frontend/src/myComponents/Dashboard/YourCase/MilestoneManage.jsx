@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
 // Sample data for milestones
+//TODO: get from backend
 const initialMilestones = [
   {
     id: 1,
@@ -26,7 +27,6 @@ const initialMilestones = [
     description: "User submits a legal case with necessary details and documents.",
     status: "Completed",
     payment: 500,
-    comments: "Case successfully created and assigned to a legal expert.",
   },
   {
     id: 2,
@@ -34,7 +34,6 @@ const initialMilestones = [
     description: "System assigns a verified legal professional to the case.",
     status: "Completed",
     payment: 1000,
-    comments: "Advocate assigned and client notified.",
   },
   {
     id: 3,
@@ -42,7 +41,6 @@ const initialMilestones = [
     description: "First interaction between client and legal expert.",
     status: "Pending",
     payment: 1500,
-    comments: "Awaiting client availability for consultation.",
   },
   {
     id: 4,
@@ -50,7 +48,6 @@ const initialMilestones = [
     description: "Legal expert reviews submitted documents for accuracy and validity.",
     status: "Pending",
     payment: 1500,
-    comments: "",
   },
   {
     id: 5,
@@ -58,7 +55,6 @@ const initialMilestones = [
     description: "Preparation of legal drafts, contracts, or petitions.",
     status: "Rejected",
     payment: 800,
-    comments: "Draft requires revision due to missing details.",
   },
   {
     id: 6,
@@ -66,7 +62,6 @@ const initialMilestones = [
     description: "Case is filed in court and initial hearing date is set.",
     status: "Pending",
     payment: 2000,
-    comments: "",
   },
   {
     id: 7,
@@ -74,7 +69,6 @@ const initialMilestones = [
     description: "Final case resolution with legal outcome or settlement.",
     status: "Pending",
     payment: 2500,
-    comments: "Awaiting final judgment or agreement.",
   },
 ];
 
@@ -111,11 +105,11 @@ export default function MilestoneManage() {
   }
 
   // Handle reject milestone
-  const handleRejectMilestone = (milestone) => {
-    setSelectedMilestone(milestone)
-    setDialogType("reject")
-    setIsDialogOpen(true)
-  }
+  // const handleRejectMilestone = (milestone) => {
+  //   setSelectedMilestone(milestone)
+  //   setDialogType("reject")
+  //   setIsDialogOpen(true)
+  // }
 
   // Handle add milestone
   const handleAddMilestone = () => {
@@ -140,9 +134,9 @@ export default function MilestoneManage() {
     } else if (dialogType === "complete") {
       // Update milestone status
       setMilestones(milestones.map((m) => (m.id === selectedMilestone.id ? { ...m, status: "Completed" } : m)))
-    } else if (dialogType === "reject") {
-      // Update milestone status
-      setMilestones(milestones.map((m) => (m.id === selectedMilestone.id ? { ...m, status: "Rejected" } : m)))
+    // } else if (dialogType === "reject") {
+    //   // Update milestone status
+    //   setMilestones(milestones.map((m) => (m.id === selectedMilestone.id ? { ...m, status: "Rejected" } : m)))
     } else if (dialogType === "add") {
       // Add new milestone
       const newId = Math.max(...milestones.map((m) => m.id)) + 1
@@ -152,7 +146,6 @@ export default function MilestoneManage() {
         description: newMilestone.description,
         status: "Pending",
         payment: Number.parseFloat(newMilestone.payment) || 0,
-        comments: "",
       }
       setMilestones([...milestones, milestoneToAdd])
       setNewMilestone({ title: "", description: "", payment: "" })
@@ -249,9 +242,9 @@ export default function MilestoneManage() {
                             >
                               Complete
                             </Button>
-                            <Button variant="destructive" size="sm" onClick={() => handleRejectMilestone(milestone)}>
+                            {/* <Button variant="destructive" size="sm" onClick={() => handleRejectMilestone(milestone)}>
                               Reject
-                            </Button>
+                            </Button> */}
                           </>
                         )}
                       </div>
@@ -269,6 +262,7 @@ export default function MilestoneManage() {
         </CardFooter>
       </Card>
 
+      {/* milestone Statistics */}
       <div className="grid md:grid-cols-2 gap-6">
         <Card className="border-black/10">
           <CardHeader>
@@ -297,7 +291,8 @@ export default function MilestoneManage() {
             </div>
           </CardContent>
         </Card>
-
+        
+        {/* recent activity */}
         <Card className="border-black/10">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>

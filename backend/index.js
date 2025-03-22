@@ -60,12 +60,14 @@ app.use((req, res, next) => {
 const userRoutes = require("./routes/User")
 const caseRoutes = require("./routes/Case")
 const profileRoutes = require("./routes/Profile")
+const milestoneRoutes = require("./routes/Milestone")
 
 //routes
 app.use("/api/v1/auth", userRoutes)
 app.use("/api/v1/case", caseRoutes)
 app.use("/api/v1/profile",profileRoutes)
 app.use("/api/v1/message", messageRoutes)
+app.use("/api/v1/milestone", milestoneRoutes)
 
 
 //default route

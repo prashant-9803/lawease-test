@@ -116,23 +116,11 @@ exports.acceptCase = async(req,res) => {
         })
 
         console.log("milestone1: ", milestone1)
-
-        const milestone2 = await Milestone.create({
-            title: "Consultation",
-            description: "Consultation of proposed case is done",
-            status: "Incomplete",
-        })
-
-        const milestone3 = await Milestone.create({
-            title: "Case Resolved",
-            description: "Case is resolved by the service provider",
-            status: "Incomplete",
-        })
         
-        //push milestones into case
+        //push milestone into case
         await Case.findByIdAndUpdate(caseId, {
             $push: {
-                caseMilestones: { $each: [milestone1._id, milestone2._id, milestone3._id] }
+                caseMilestones: milestone1._id
             }
         })
 
