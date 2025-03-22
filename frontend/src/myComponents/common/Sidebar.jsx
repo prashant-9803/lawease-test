@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart3, BookOpen, Calendar, FileText, Home, MessageSquare, PieChart, Settings, Users, Inbox } from 'lucide-react';
+import { BarChart3, BookOpen, Calendar, FileText, FileDigit,Home, MessageSquare, PieChart, Settings, Users, Inbox } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -17,9 +17,10 @@ import { useNavigate } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 
 const SidebarCol = () => {
-  const navigate = useNavigate(); // Initialize the navigate function
+  const navigate = useNavigate();
   const { user } = useSelector((state) => state.profile);
   const { firstName, lastName, accountType } = user;
+  const isProvider = accountType === "Provider";
 
   return (
     <div>
@@ -47,30 +48,47 @@ const SidebarCol = () => {
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
               <NavLink to="/dashboard" className="flex items-center gap-2">
-                  <Home className="mr-2 size-4" />
-                  Analytics
-                  </NavLink>
+  <Home className="mr-2 size-4" />
+  {isProvider ? "Analytics" : "Your Case"}
+</NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-              <NavLink to="/dashboard/your-case" className="flex items-center gap-2">
-                  <FileText className="mr-2 size-4" />
-                  Your Case
-                  </NavLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-              <NavLink to="/dashboard/pending-cases" className="flex items-center gap-2"><Users className="mr-2 size-4" />
-                  Pending Cases
-                  </NavLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            
+            {/* Only show Your Case as separate menu for Providers */}
+            {isProvider && (
+  <SidebarMenuItem>
+    <SidebarMenuButton asChild>
+      <NavLink to="/dashboard/your-case" className="flex items-center gap-2">
+        <FileText className="mr-2 size-4" />
+        Your Case
+      </NavLink>
+    </SidebarMenuButton>
+  </SidebarMenuItem>
+)}
+            
+            {/* Only show Pending Cases menu item for Provider accounts */}
+            {isProvider && (
+  <SidebarMenuItem>
+    <SidebarMenuButton asChild>
+      <NavLink to="/dashboard/pending-cases" className="flex items-center gap-2">
+        <Users className="mr-2 size-4" />
+        Pending Cases
+      </NavLink>
+    </SidebarMenuButton>
+  </SidebarMenuItem>
+)}
+            
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
               <NavLink to="/dashboard/chat" className="flex items-center gap-2">
                 <MessageSquare className="mr-2 size-4" /> Chat
+              </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+              <NavLink to="/dashboard/pdf-summary" className="flex items-center gap-2">
+                <FileDigit className="mr-2 size-4" /> PDF Summary
               </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>

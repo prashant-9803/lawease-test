@@ -20,6 +20,7 @@ import Chat from "./myComponents/Dashboard/Chat/Chat";
 import PaymentHistory from "./myComponents/Dashboard/PaymentHistory/PaymentHistory";
 import Analytics from "./myComponents/Dashboard/Analytics/Analytics";
 import CaseYour from "./myComponents/Dashboard/YourCase/CaseYour";
+import PDFSummary from './myComponents/Dashboard/PdfSummary/PdfSummary';
 // import CaseCreation from "./pages/1";
 // import CaseCreation2 from "./pages/0";
 
@@ -34,8 +35,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/providers" element={<Providers />} />
+            <Route path="/form" element={<Form />} />
             {/* Client-only Routes */}
             <Route
               path="/create-case"
@@ -45,16 +46,24 @@ function App() {
                 </PrivateRoute>
               }
             />
-
+            
             {/* Provider-only Routes */}
-            <Route
+            {/* <Route
               path="/form"
               element={
                 <PrivateRoute roleRequired="Provider">
                   <Form />
                 </PrivateRoute>
               }
-            />
+            /> */}
+            <Route
+              path="/leaderboard"
+              element={
+            <PrivateRoute>
+              <Leaderboard />
+            </PrivateRoute>
+             }
+/>
             <Route
               path="/accept-case"
               element={
@@ -98,7 +107,12 @@ function App() {
                   </PrivateRoute>
                 }
               />
-
+               <Route path="pdf-summary" element={
+              <PrivateRoute>
+                <PDFSummary />
+              </PrivateRoute>
+            } />
+           
               <Route
                 path="payment-history"
                 element={

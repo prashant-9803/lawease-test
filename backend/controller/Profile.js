@@ -168,3 +168,92 @@ exports.getMatchedProviders = async(req,res) => {
   }
 }
   
+exports.getProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    // Find the user
+    const user = await User.findById(userId).populate("additionalDetails");
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+    
+    // Check if provider has set their profile
+    // For providers, check if they have the required fields
+    if (user.accountType === "Provider") {
+      const profile = await Profile.findById(user.additionalDetails);
+      
+      // Check if profile has necessary fields filled
+      const isProfileComplete = profile && 
+        profile.category && 
+        profile.enrollmentNumber && 
+        profile.contactNumber;
+      
+      return res.status(200).json({
+        success: true,
+        profile: isProfileComplete ? profile : null
+      });
+    }
+    
+    // For clients, return their profile data
+    return res.status(200).json({
+      success: true,
+      profile: user.additionalDetails
+    });
+    
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch profile",
+      error: error.message
+    });
+  }
+};
+
+// Verify enrollment number
+exports.verifyEnrollment = async (req, res) => {
+  try {
+    const { enrollmentNumber } = req.body;
+    
+    if (!enrollmentNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "Enrollment number is required"
+      });
+    }
+    
+    // Here you would typically validate against a database of valid enrollment numbers
+    // This is a placeholder - you should implement actual validation logic
+    
+    // Example validation (replace with your actual logic):
+    // const isValid = await EnrollmentRegistry.findOne({ number: enrollmentNumber });
+    
+    // For this example, we'll accept enrollment numbers that are at least 5 chars long
+    const isValid = enrollmentNumber.length >= 5;
+    
+    if (!isValid) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid enrollment number. You are not authorized to use the system."
+      });
+    }
+    
+    return res.status(200).json({
+      success: true,
+      message: "Enrollment number verified successfully"
+    });
+    
+  } catch (error) {
+    console.error("Error verifying enrollment:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to verify enrollment number",
+      error: error.message
+    });
+  }
+};

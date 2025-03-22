@@ -431,3 +431,100 @@ exports.updateCaseStatus = async (req, res) => {
         });
     }
 };
+
+exports.uploadPdfForSummary = async(req, res) => {
+    try {
+        // Check if this is a summary request (GET) or an upload request (POST)
+        if (req.method === 'GET') {
+            // This is a summary request
+            const axios = require('axios');
+            
+            try {
+                const summaryResponse = await axios.get(
+                    'https://d9a7-35-240-138-126.ngrok-free.app//get_summary?file_path=/content/downloaded_file.pdf',
+                    { 
+                        headers: { 'Content-Type': 'application/json' }
+                    }
+                );
+                
+                if (!summaryResponse.data) {
+                    return res.status(404).json({
+                        success: false,
+                        message: "Failed to generate summary"
+                    });
+                }
+                
+                return res.status(200).json({
+                    success: true,
+                    summary: summaryResponse.data
+                });
+            } catch (error) {
+                console.error("Error generating PDF summary:", error);
+                return res.status(500).json({
+                    success: false,
+                    message: "Failed to generate summary",
+                    error: error.message
+                });
+            }
+        }
+        
+        // This is an upload request (POST)
+        const pdfFile = req.files.pdfFile;
+        
+        if (!pdfFile) {
+            return res.status(400).json({
+                success: false,
+                message: "PDF file is required"
+            });
+        }
+        
+        // Step 1: Upload PDF to Cloudinary
+        const uploadResult = await uploadToCloudinary(pdfFile, "case_pdfs");
+        
+        if (!uploadResult || !uploadResult.secure_url) {
+            return res.status(400).json({
+                success: false,
+                message: "PDF upload to Cloudinary failed"
+            });
+        }
+        
+        const pdfUrl = uploadResult.secure_url;
+        
+        // Step 2: Process the PDF with external API 
+        const axios = require('axios');
+        let processingResult = null;
+        let processingSuccess = false;
+        
+        try {
+            const processingResponse = await axios.post(
+                'https://d9a7-35-240-138-126.ngrok-free.app/download_pdf',
+                { url: pdfUrl },
+                { 
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            );
+            
+            processingResult = processingResponse.data;
+            processingSuccess = true;
+        } catch (processingError) {
+            console.error("PDF processing error:", processingError);
+            // We'll continue even if processing fails, since the upload was successful
+        }
+        
+        // Return both the URL and processing result
+        return res.status(200).json({
+            success: true,
+            pdfUrl: pdfUrl,
+            processingSuccess: processingSuccess,
+            processingResult: processingResult
+        });
+        
+    } catch(error) {
+        console.error("Error in PDF upload and processing:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to upload and process PDF",
+            error: error.message
+        });
+    }
+};
