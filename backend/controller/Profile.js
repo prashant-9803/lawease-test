@@ -58,7 +58,7 @@ exports.setProfile = async(req,res) => {
       const capTaluka = taluka.toUpperCase()
       const BAR_COUNCIL_API = process.env.BAR_COUNCIL_API
       const barName = `${capTaluka} TALUKA   BAR ASSOCIATION,  ${capDistrict}`
-        
+      
       //fetch data from bar council
       try {
         //make form data
