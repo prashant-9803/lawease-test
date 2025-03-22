@@ -36,83 +36,147 @@ exports.addMilestone = async(req, res) => {
     }
 };
 
-// // Get all milestones for a case
-// exports.getMilestonesByCaseId = async(req, res) => {
-//     try {
-//         const { caseId } = req.params;
+// Complete a milestone
+exports.completeMilestone = async (req, res) => {
+    try {
+        const { milestoneId } = req.body;
         
-//         const milestones = await Milestone.find({ caseId }).sort({ createdAt: 1 });
+        // Check if milestone exists
+        const milestone = await Milestone.findById(milestoneId);
         
-//         res.status(200).json({
-//             success: true,
-//             count: milestones.length,
-//             milestones
-//         });
-//     } catch (error) {
-//         res.status(500).json({
-//             success: false,
-//             message: "Failed to fetch milestones",
-//             error: error.message
-//         });
-//     }
-// };
+        if (!milestone) {
+            return res.status(404).json({
+                success: false,
+                message: "Milestone not found"
+            });
+        }
+        
+        // Update milestone status to Completed
+        milestone.status = "Completed";
+        await milestone.save();
+        
+        res.status(200).json({
+            success: true,
+            message: "Milestone completed successfully",
+            data: milestone
+        });
+    } catch (error) {
+        console.error("Error completing milestone:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to complete milestone",
+            error: error.message
+        });
+    }
+};
 
-// // Update milestone status
-// exports.updateMilestoneStatus = async(req, res) => {
-//     try {
-//         const { id } = req.params;
-//         const { status } = req.body;
+// Accept a milestone (by client)
+exports.acceptMilestone = async (req, res) => {
+    try {
+        const { milestoneId } = req.body;
         
-//         const milestone = await Milestone.findByIdAndUpdate(
-//             id, 
-//             { status },
-//             { new: true, runValidators: true }
-//         );
+        // Check if milestone exists
+        const milestone = await Milestone.findById(milestoneId);
         
-//         if (!milestone) {
-//             return res.status(404).json({
-//                 success: false,
-//                 message: "Milestone not found"
-//             });
-//         }
+        if (!milestone) {
+            return res.status(404).json({
+                success: false,
+                message: "Milestone not found"
+            });
+        }
         
-//         res.status(200).json({
-//             success: true,
-//             message: "Milestone status updated successfully",
-//             milestone
-//         });
-//     } catch (error) {
-//         res.status(500).json({
-//             success: false,
-//             message: "Failed to update milestone status",
-//             error: error.message
-//         });
-//     }
-// };
+        // Check if milestone is in Proposed status
+        if (milestone.status !== "Pending") {
+            return res.status(400).json({
+                success: false,
+                message: "Only Pending milestones can be accepted"
+            });
+        }
+        
+        // DUMMY PAYMENT PROCESSING
+        // In a real app, you would integrate with a payment gateway here
+        console.log(`Processing payment of ₹${milestone.payment} for milestone: ${milestone.title}`);
+        
+        // Update milestone status to In-progress
+        milestone.status = "In-progress";
+        await milestone.save();
+        
+        res.status(200).json({
+            success: true,
+            message: "Milestone accepted and payment processed successfully",
+            data: milestone
+        });
+    } catch (error) {
+        console.error("Error accepting milestone:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to accept milestone",
+            error: error.message
+        });
+    }
+};
 
-// // Delete a milestone
-// exports.deleteMilestone = async(req, res) => {
-//     try {
-//         const { id } = req.params;
+// Get all milestones for a case
+exports.getAllMilestones = async (req, res) => {
+    try {
+        const { caseId } = req.body;
         
-//         const milestone = await Milestone.findByIdAndDelete(id);
+        // Find the case
+        const caseData = await Case.findById(caseId).populate('caseMilestones');
         
-//         if (!milestone) {
-//             return res.status(404).json({
-//                 success: false,
-//                 message: "Milestone not found"
-//             });
-//         }
+        if (!caseData) {
+            return res.status(404).json({
+                success: false,
+                message: "Case not found"
+            });
+        }
         
-//         res.status(200).json({
-//             success: true,
-//             message: "Milestone deleted successfully"
-//         });
-//     } catch (error) {
-//         res.status(500).json({
-//             success: false,
-//             message: "Failed to delete milestone",
-//             error: error.message
-//         });
-//     }
-// };
+        res.status(200).json({
+            success: true,
+            message: "Milestones retrieved successfully",
+            data: caseData.caseMilestones
+        });
+    } catch (error) {
+        console.error("Error retrieving milestones:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve milestones",
+            error: error.message
+        });
+    }
+};
+
+// Get pending milestones for a case
+exports.getPendingMilestones = async (req, res) => {
+    try {
+        const { caseId } = req.body;
+        
+        // Find the case
+        const caseData = await Case.findById(caseId).populate({
+            path: 'caseMilestones',
+            match: { status: "Pending" }
+        });
+        
+        if (!caseData) {
+            return res.status(404).json({
+                success: false,
+                message: "Case not found"
+            });
+        }
+        
+        res.status(200).json({
+            success: true,
+            message: "Pending milestones retrieved successfully",
+            data: caseData.caseMilestones
+        });
+    } catch (error) {
+        console.error("Error retrieving pending milestones:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve pending milestones",
+            error: error.message
+        });
+    }
+};
+
+
