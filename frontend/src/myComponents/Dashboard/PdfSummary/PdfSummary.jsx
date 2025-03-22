@@ -51,6 +51,7 @@ const PDFSummary = () => {
       );
       
       if (response.data && response.data.success) {
+        // Store the summary as is, without assuming its format
         setSummary(response.data.summary);
         toast.success('Summary generated successfully!', { id: summaryToastId });
       } else {
@@ -123,7 +124,7 @@ const PDFSummary = () => {
   
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8 text-center">Legal Document Analyzer</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Legal Document Summarization</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* Results Panel - Larger */}
@@ -155,16 +156,24 @@ const PDFSummary = () => {
                     </div>
                   )}
                 </div>
-              ) : summary ? (
-                <div className="p-5">
-                  <h2 className="text-xl font-bold mb-4 text-gray-800">Document Summary</h2>
-                  <div className="bg-gray-50 p-4 rounded-md border text-gray-800 h-72 overflow-auto">
-                    {summary.split('\n').map((paragraph, index) => (
+             ) : summary ? (
+              <div className="p-5">
+                <h2 className="text-xl font-bold mb-4 text-gray-800">Document Summary</h2>
+                <div className="bg-gray-50 p-4 rounded-md border text-gray-800 h-72 overflow-auto">
+                  {typeof summary === 'string' ? (
+                    // If summary is a string, display it with line breaks
+                    summary.split('\n').map((paragraph, index) => (
                       paragraph ? <p key={index} className="mb-3">{paragraph}</p> : <br key={index} />
-                    ))}
-                  </div>
+                    ))
+                  ) : (
+                    // If summary is an object or other type, stringify it
+                    <pre className="whitespace-pre-wrap">
+                      {JSON.stringify(summary, null, 2)}
+                    </pre>
+                  )}
                 </div>
-              ) : processingSuccess ? (
+              </div>
+            ) : processingSuccess ? (
                 <div className="p-5">
                   <h2 className="text-xl font-bold mb-4 text-gray-800">Document Preview</h2>
                   <div className="bg-gray-50 rounded-md border h-72 flex flex-col overflow-hidden">

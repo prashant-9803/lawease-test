@@ -436,37 +436,30 @@ exports.uploadPdfForSummary = async(req, res) => {
     try {
         // Check if this is a summary request (GET) or an upload request (POST)
         if (req.method === 'GET') {
-            // This is a summary request
-            const axios = require('axios');
-            
             try {
-                const summaryResponse = await axios.get(
-                    'https://d9a7-35-240-138-126.ngrok-free.app//get_summary?file_path=/content/downloaded_file.pdf',
-                    { 
-                        headers: { 'Content-Type': 'application/json' }
-                    }
-                );
-                
-                if (!summaryResponse.data) {
-                    return res.status(404).json({
-                        success: false,
-                        message: "Failed to generate summary"
-                    });
+              const axios = require('axios');
+              
+              const summaryResponse = await axios.get(
+                'https://8b7e-34-126-137-93.ngrok-free.app//get_summary?file_path=/content/downloaded_file.pdf',
+                { 
+                  headers: { 'Content-Type': 'application/json' }
                 }
-                
-                return res.status(200).json({
-                    success: true,
-                    summary: summaryResponse.data
-                });
+              );
+              
+              // Return the summary directly from the external API
+              return res.status(200).json({
+                success: true,
+                summary: summaryResponse.data.summary
+              });
             } catch (error) {
-                console.error("Error generating PDF summary:", error);
-                return res.status(500).json({
-                    success: false,
-                    message: "Failed to generate summary",
-                    error: error.message
-                });
+              console.error("Error generating PDF summary:", error);
+              return res.status(500).json({
+                success: false,
+                message: "Failed to generate summary",
+                error: error.message
+              });
             }
-        }
+          }
         
         // This is an upload request (POST)
         const pdfFile = req.files.pdfFile;
@@ -497,7 +490,7 @@ exports.uploadPdfForSummary = async(req, res) => {
         
         try {
             const processingResponse = await axios.post(
-                'https://d9a7-35-240-138-126.ngrok-free.app/download_pdf',
+                'https://8b7e-34-126-137-93.ngrok-free.app/download_pdf',
                 { url: pdfUrl },
                 { 
                     headers: { 'Content-Type': 'application/json' }
