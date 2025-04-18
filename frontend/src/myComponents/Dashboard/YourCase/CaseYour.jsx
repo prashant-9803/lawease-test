@@ -496,7 +496,7 @@ const CaseYour = () => {
         {/* Milestones Tab */}
         {activeTab === "milestones" && (
           <div>
-            <MilestoneManagement />
+            <MilestoneManagement caseId={selectedCase?._id} />
           </div>
         )}
 

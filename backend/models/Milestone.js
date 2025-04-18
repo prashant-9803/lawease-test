@@ -16,7 +16,8 @@ const milestoneSchema = new mongoose.Schema({
     },
     payment: {
         type: Number,
-        required: true
+        required: true,
+        default: 0
     },
     createdAt: {
         type: Date,

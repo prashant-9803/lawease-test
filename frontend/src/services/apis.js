@@ -30,3 +30,6 @@ export const chatEndpoints = {
     ADD_IMAGE_MESSAGE_ROUTE: BASE_URL + "/message/add-image-message",
 }
 
+export const milestoneEndpoints = {
+    GET_ALL_MILESTONES: BASE_URL + "/milestone/get-all-milestones",
+}

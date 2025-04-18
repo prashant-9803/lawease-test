@@ -119,7 +119,10 @@ exports.acceptMilestone = async (req, res) => {
 // Get all milestones for a case
 exports.getAllMilestones = async (req, res) => {
     try {
+        
         const { caseId } = req.body;
+
+        console.log("caseId from backend: ", caseId)
         
         // Find the case
         const caseData = await Case.findById(caseId).populate('caseMilestones');

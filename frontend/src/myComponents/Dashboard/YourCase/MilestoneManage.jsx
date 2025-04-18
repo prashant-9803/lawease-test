@@ -1,5 +1,5 @@
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Bell, CheckCircle, Clock, XCircle, Plus } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -17,54 +17,56 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { getAllMilestones } from "@/services/operations/milestoneAPI"
+import { useSelector } from "react-redux"
 
 // Sample data for milestones
 //TODO: get from backend
 const initialMilestones = [
   {
-    id: 1,
+    _id: 1,
     title: "Case Creation",
     description: "User submits a legal case with necessary details and documents.",
     status: "Completed",
     payment: 500,
   },
   {
-    id: 2,
+    _id: 2,
     title: "Legal Service Provider Assignment",
     description: "System assigns a verified legal professional to the case.",
     status: "Completed",
     payment: 1000,
   },
   {
-    id: 3,
+    _id: 3,
     title: "Initial Consultation",
     description: "First interaction between client and legal expert.",
     status: "Pending",
     payment: 1500,
   },
   {
-    id: 4,
+    _id: 4,
     title: "Case Review & Document Verification",
     description: "Legal expert reviews submitted documents for accuracy and validity.",
     status: "Pending",
     payment: 1500,
   },
   {
-    id: 5,
+    _id: 5,
     title: "Drafting Legal Documents",
     description: "Preparation of legal drafts, contracts, or petitions.",
     status: "Rejected",
     payment: 800,
   },
   {
-    id: 6,
+    _id: 6,
     title: "Court Filing & Proceedings",
     description: "Case is filed in court and initial hearing date is set.",
     status: "Pending",
     payment: 2000,
   },
   {
-    id: 7,
+    _id: 7,
     title: "Case Resolution & Closure",
     description: "Final case resolution with legal outcome or settlement.",
     status: "Pending",
@@ -74,21 +76,32 @@ const initialMilestones = [
 
 
 
-export default function MilestoneManage() {
+export default function MilestoneManage({caseId}) {
   const [milestones, setMilestones] = useState(initialMilestones)
   const [selectedMilestone, setSelectedMilestone] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [dialogType, setDialogType] = useState("")
+  const token = useSelector((state) => state.auth.token)
   const [newMilestone, setNewMilestone] = useState({
     title: "",
     description: "",
     payment: "",
   })
 
+   
+  
+
   // Calculate completion percentage
   const completionPercentage = Math.round(
     (milestones.filter((m) => m.status === "Completed").length / milestones.length) * 100,
   )
+
+  useEffect(async() => {
+    console.log("selected case: ", caseId);
+    const response = await getAllMilestones({token, caseId}); 
+    console.log("Respoinser", response);
+    setMilestones(response)
+  }, []);
 
   // Handle request approval
   const handleRequestApproval = (milestone) => {
@@ -104,12 +117,6 @@ export default function MilestoneManage() {
     setIsDialogOpen(true)
   }
 
-  // Handle reject milestone
-  // const handleRejectMilestone = (milestone) => {
-  //   setSelectedMilestone(milestone)
-  //   setDialogType("reject")
-  //   setIsDialogOpen(true)
-  // }
 
   // Handle add milestone
   const handleAddMilestone = () => {
@@ -133,15 +140,12 @@ export default function MilestoneManage() {
       alert(`Approval requested for milestone: ${selectedMilestone.title}`)
     } else if (dialogType === "complete") {
       // Update milestone status
-      setMilestones(milestones.map((m) => (m.id === selectedMilestone.id ? { ...m, status: "Completed" } : m)))
-    // } else if (dialogType === "reject") {
-    //   // Update milestone status
-    //   setMilestones(milestones.map((m) => (m.id === selectedMilestone.id ? { ...m, status: "Rejected" } : m)))
+      setMilestones(milestones.map((m) => (m._id === selectedMilestone._id ? { ...m, status: "Completed" } : m)))
     } else if (dialogType === "add") {
       // Add new milestone
-      const newId = Math.max(...milestones.map((m) => m.id)) + 1
+      const newId = Math.max(...milestones.map((m) => m._id)) + 1
       const milestoneToAdd = {
-        id: newId,
+        _id: newId,
         title: newMilestone.title,
         description: newMilestone.description,
         status: "Pending",
@@ -199,7 +203,7 @@ export default function MilestoneManage() {
               <span className="text-sm font-medium">Project Completion</span>
               <span className="text-sm font-medium">{completionPercentage}%</span>
             </div>
-            <Progress value={completionPercentage} className="h-2 bg-gray-200" indicatorClassName="bg-black" />
+            <Progress value={completionPercentage} className="h-2 bg-gray-200" indicatorclassname="bg-black" />
           </div>
 
           <div className="overflow-x-auto">
@@ -216,8 +220,8 @@ export default function MilestoneManage() {
               </TableHeader>
               <TableBody>
                 {milestones.map((milestone) => (
-                  <TableRow key={milestone.id}>
-                    <TableCell className="font-bold">{milestone.id}</TableCell>
+                  <TableRow key={milestone._id}>
+                    <TableCell className="font-bold">{milestone._id}</TableCell>
                     <TableCell className="font-medium">{milestone.title}</TableCell>
                     <TableCell>{milestone.description}</TableCell>
                     <TableCell>₹{milestone.payment.toLocaleString()}</TableCell>
@@ -261,6 +265,9 @@ export default function MilestoneManage() {
           </Button>
         </CardFooter>
       </Card>
+
+
+
 
       {/* milestone Statistics */}
       <div className="grid md:grid-cols-2 gap-6">

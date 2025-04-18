@@ -112,7 +112,7 @@ exports.acceptCase = async(req,res) => {
         const milestone1 = await Milestone.create({
             title: "Case accepted",
             description: "Case is accepted by the service provider",
-            status: "Complete",
+            status: "Completed",
         })
 
         console.log("milestone1: ", milestone1)
@@ -151,7 +151,8 @@ exports.acceptCase = async(req,res) => {
     catch(error) {
         return res.status(400).json({ 
             success: false, 
-            message: "Error while accepting case" 
+            message: "Error while accepting case" ,
+            error : error
         })
     }
 }
