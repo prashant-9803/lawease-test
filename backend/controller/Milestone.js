@@ -5,6 +5,8 @@ const Case = require('../models/Case');
 exports.addMilestone = async(req, res) => {
     try {
         const { title, description, payment, caseId } = req.body;
+
+        console.log(req.body);
         
         // Create the milestone
         const newMilestone = new Milestone({

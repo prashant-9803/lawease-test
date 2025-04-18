@@ -32,4 +32,6 @@ export const chatEndpoints = {
 
 export const milestoneEndpoints = {
     GET_ALL_MILESTONES: BASE_URL + "/milestone/get-all-milestones",
+    ADD_MILESTONE: BASE_URL + "/milestone/add-milestone",
+    COMPLETE_MILESTONE: BASE_URL + "/milestone/complete-milestone",
 }

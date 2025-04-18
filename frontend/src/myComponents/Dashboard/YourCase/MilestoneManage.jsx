@@ -17,7 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { getAllMilestones } from "@/services/operations/milestoneAPI"
+import { addMilestone, completeMilestone, getAllMilestones } from "@/services/operations/milestoneAPI"
 import { useSelector } from "react-redux"
 
 // Sample data for milestones
@@ -103,12 +103,7 @@ export default function MilestoneManage({caseId}) {
     setMilestones(response)
   }, []);
 
-  // Handle request approval
-  const handleRequestApproval = (milestone) => {
-    setSelectedMilestone(milestone)
-    setDialogType("request")
-    setIsDialogOpen(true)
-  }
+
 
   // Handle complete milestone
   const handleCompleteMilestone = (milestone) => {
@@ -134,24 +129,20 @@ export default function MilestoneManage({caseId}) {
   }
 
   // Submit dialog action
-  const handleDialogSubmit = () => {
+  const handleDialogSubmit = async() => {
     if (dialogType === "request") {
       // In a real app, this would send a request to the server
       alert(`Approval requested for milestone: ${selectedMilestone.title}`)
     } else if (dialogType === "complete") {
       // Update milestone status
+      const response = await completeMilestone({token, milestoneId: selectedMilestone._id})
       setMilestones(milestones.map((m) => (m._id === selectedMilestone._id ? { ...m, status: "Completed" } : m)))
     } else if (dialogType === "add") {
       // Add new milestone
-      const newId = Math.max(...milestones.map((m) => m._id)) + 1
-      const milestoneToAdd = {
-        _id: newId,
-        title: newMilestone.title,
-        description: newMilestone.description,
-        status: "Pending",
-        payment: Number.parseFloat(newMilestone.payment) || 0,
-      }
-      setMilestones([...milestones, milestoneToAdd])
+      
+      const response = await addMilestone({token, caseId, newMilestone})
+      setMilestones([...milestones, response])
+      console.log("new milestones from frontend: ", milestones);
       setNewMilestone({ title: "", description: "", payment: "" })
     }
     setIsDialogOpen(false)
@@ -230,14 +221,7 @@ export default function MilestoneManage({caseId}) {
                       <div className="flex gap-2">
                         {milestone.status === "Pending" && (
                           <>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleRequestApproval(milestone)}
-                              className="border-black/20 hover:bg-black/5"
-                            >
-                              Request
-                            </Button>
+                            
                             <Button
                               variant="default"
                               size="sm"
