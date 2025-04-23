@@ -1,9 +1,12 @@
 const express = require("express")
 const router = express.Router()
 
-const {monthlyPaymentData} = require("../controller/Payment")
+const {monthlyIncomeData, caseStatusData, casesByMonthData} = require("../controller/Payment")
 
 
-router.post("/monthlyIncome", monthlyPaymentData);
+router.post("/monthly-income", monthlyIncomeData);
+router.post("/case-status", caseStatusData);
+router.post("/monthly-case-status", casesByMonthData);
+
 
 module.exports = router;
