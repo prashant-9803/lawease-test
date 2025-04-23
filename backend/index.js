@@ -61,12 +61,14 @@ const userRoutes = require("./routes/User")
 const caseRoutes = require("./routes/Case")
 const profileRoutes = require("./routes/Profile")
 const milestoneRoutes = require("./routes/Milestone")
+const paymentRoutes = require("./routes/Payment")
 
 //routes
 app.use("/api/v1/auth", userRoutes)
 app.use("/api/v1/case", caseRoutes)
 app.use("/api/v1/profile",profileRoutes)
 app.use("/api/v1/message", messageRoutes)
+app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/milestone", milestoneRoutes)
 
 
