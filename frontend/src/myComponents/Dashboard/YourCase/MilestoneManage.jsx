@@ -17,7 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { addMilestone, completeMilestone, getAllMilestones } from "@/services/operations/milestoneAPI"
+import { acceptMilestone, addMilestone, completeMilestone, getAllMilestones } from "@/services/operations/milestoneAPI"
 import { useSelector } from "react-redux"
 
 // Sample data for milestones
@@ -88,6 +88,11 @@ export default function MilestoneManage({caseId}) {
     payment: "",
   })
 
+  const {user} = useSelector((state) => state.profile);
+  const accountType = user?.accountType;
+
+  console.log("user: ", user);
+
    
   
 
@@ -110,6 +115,12 @@ export default function MilestoneManage({caseId}) {
     setSelectedMilestone(milestone)
     setDialogType("complete")
     setIsDialogOpen(true)
+  }
+
+  const handleApproveMilestone = (milestone) => {
+    const milestoneId = milestone._id;
+    const response = acceptMilestone({token ,milestoneId});
+    
   }
 
 
@@ -222,14 +233,22 @@ export default function MilestoneManage({caseId}) {
                         {milestone.status === "Pending" && (
                           <>
                             
-                            <Button
+                            {
+                              accountType == "Provider" ? (
+                                <Button variant="outline" size="sm" onClick={() => handleCompleteMilestone(milestone)}>
+                                  Complete
+                                </Button>
+                              ) : (
+                                <Button
                               variant="default"
                               size="sm"
-                              onClick={() => handleCompleteMilestone(milestone)}
+                              onClick={() => handleApproveMilestone(milestone)}
                               className="bg-black text-white hover:bg-black/80"
                             >
-                              Complete
+                              Approve
                             </Button>
+                              )
+                            }
                             {/* <Button variant="destructive" size="sm" onClick={() => handleRejectMilestone(milestone)}>
                               Reject
                             </Button> */}
@@ -243,11 +262,15 @@ export default function MilestoneManage({caseId}) {
             </Table>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-end">
+       {
+        accountType == "Provider" ? (
+          <CardFooter className="flex justify-end">
           <Button onClick={handleAddMilestone} className="bg-black text-white hover:bg-black/80">
             <Plus className="mr-2 h-4 w-4" /> Add Milestone
           </Button>
         </CardFooter>
+        ) : (<div></div>)
+       }
       </Card>
 
 
