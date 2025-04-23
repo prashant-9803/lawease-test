@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { Calendar, ChevronDown, Filter, Star } from "lucide-react"
+import { useEffect, useState } from "react";
+import { Calendar, ChevronDown, Filter, Star } from "lucide-react";
 import {
   Bar,
   CartesianGrid,
@@ -12,10 +12,16 @@ import {
   XAxis,
   YAxis,
   BarChart,
-} from "recharts"
+} from "recharts";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,39 +29,41 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getAnalyticsCaseStatus, getAnalyticsMonthlyCaseStatus, getAnalyticsMonthlyIncome } from "@/services/operations/analyticsAPI";
+import { useSelector } from "react-redux";
 
 // Sample data for the charts
-const monthlyIncomeData = [
-  { name: "Jan", income: 12000 },
-  { name: "Feb", income: 15000 },
-  { name: "Mar", income: 18000 },
-  { name: "Apr", income: 14000 },
-  { name: "May", income: 21000 },
-  { name: "Jun", income: 19000 },
-  { name: "Jul", income: 22000 },
-  { name: "Aug", income: 25000 },
-  { name: "Sep", income: 23000 },
-  { name: "Oct", income: 26000 },
-  { name: "Nov", income: 24000 },
-  { name: "Dec", income: 28000 },
-]
+// let monthlyIncomeData = [
+//   { name: "Jan", income: 12000 },
+//   { name: "Feb", income: 15000 },
+//   { name: "Mar", income: 18000 },
+//   { name: "Apr", income: 14000 },
+//   { name: "May", income: 21000 },
+//   { name: "Jun", income: 19000 },
+//   { name: "Jul", income: 22000 },
+//   { name: "Aug", income: 25000 },
+//   { name: "Sep", income: 23000 },
+//   { name: "Oct", income: 26000 },
+//   { name: "Nov", income: 24000 },
+//   { name: "Dec", income: 690000 },
+// ]
 
-const caseStatusData = [
-  { name: "Pending", value: 35 },
-  { name: "In Progress", value: 45 },
-  { name: "Completed", value: 80 },
-]
+// const caseStatusData = [
+//   { name: "Pending", value: 35 },
+//   { name: "In Progress", value: 45 },
+//   { name: "Completed", value: 80 },
+// ];
 
-const casesByMonthData = [
-  { name: "Jan", pending: 10, inProgress: 15, completed: 5 },
-  { name: "Feb", pending: 12, inProgress: 18, completed: 8 },
-  { name: "Mar", pending: 15, inProgress: 20, completed: 12 },
-  { name: "Apr", pending: 8, inProgress: 17, completed: 15 },
-  { name: "May", pending: 10, inProgress: 15, completed: 20 },
-  { name: "Jun", pending: 12, inProgress: 12, completed: 25 },
-]
+// const casesByMonthData = [
+//   { name: "Jan", pending: 10, inProgress: 15, completed: 5 },
+//   { name: "Feb", pending: 12, inProgress: 18, completed: 8 },
+//   { name: "Mar", pending: 15, inProgress: 20, completed: 12 },
+//   { name: "Apr", pending: 8, inProgress: 17, completed: 15 },
+//   { name: "May", pending: 10, inProgress: 15, completed: 20 },
+//   { name: "Jun", pending: 12, inProgress: 12, completed: 25 },
+// ];
 
 const ratingData = [
   { name: "5 Stars", value: 65 },
@@ -63,15 +71,48 @@ const ratingData = [
   { name: "3 Stars", value: 7 },
   { name: "2 Stars", value: 2 },
   { name: "1 Star", value: 1 },
-]
+];
 
 export default function LawyerDashboard() {
-  const [period, setPeriod] = useState("monthly")
+  const [period, setPeriod] = useState("monthly");
+  const { token } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.profile);
+
+  const [monthlyIncomeData, setMonthlyIncomeData] = useState([]);
+  const [casesByMonthData, setCasesByMonthData] = useState([]);
+  const [caseStatusData, setCaseStatusData] = useState([]);
+
+  useEffect(async () => {
+    const getAnalytics = async () => {
+      const monthlyIncome = await getAnalyticsMonthlyIncome({
+        token,
+        userId: user?._id,
+      });
+      setMonthlyIncomeData(monthlyIncome);
+
+
+      const MonthlyCaseStatus = await getAnalyticsMonthlyCaseStatus({
+        token,
+        userId: user?._id,
+      });
+      setCasesByMonthData(MonthlyCaseStatus);
+      
+
+      const caseStatus = await getAnalyticsCaseStatus({
+        token,
+        userId: user?._id,
+      })
+      setCaseStatusData(caseStatus);      
+    };
+    getAnalytics();
+  }, []);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
       <header className="sticky top-0 z-10 flex h-16 items-center border-b bg-white px-4 md:px-6">
-        <h1 className="text-lg font-semibold md:text-2xl">Analytics Dashboard</h1>
+        <h1 className="text-lg font-semibold md:text-2xl">
+          Analytics Dashboard
+        </h1>
         <div className="ml-auto flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -84,10 +125,18 @@ export default function LawyerDashboard() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Select Period</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setPeriod("weekly")}>This Week</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setPeriod("monthly")}>This Month</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setPeriod("quarterly")}>This Quarter</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setPeriod("yearly")}>This Year</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setPeriod("weekly")}>
+                This Week
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setPeriod("monthly")}>
+                This Month
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setPeriod("quarterly")}>
+                This Quarter
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setPeriod("yearly")}>
+                This Year
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -142,34 +191,53 @@ export default function LawyerDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Monthly Income</CardTitle>
-                <CardDescription>Income analysis for the past 12 months</CardDescription>
+                <CardDescription>
+                  Income analysis for the past 12 months
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[400px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={monthlyIncomeData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <BarChart
+                      data={monthlyIncomeData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    >
                       <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
                       <XAxis dataKey="name" stroke="#333" />
                       <YAxis stroke="#333" />
                       <Tooltip
                         content={({ active, payload }) => {
-                          if (active && payload && payload.length && payload[0] && payload[0].payload) {
+                          if (
+                            active &&
+                            payload &&
+                            payload.length &&
+                            payload[0] &&
+                            payload[0].payload
+                          ) {
                             return (
                               <div className="rounded-lg border border-gray-200 bg-white p-2 shadow-sm">
                                 <div className="grid grid-cols-2 gap-2">
                                   <div className="flex flex-col">
-                                    <span className="text-sm font-medium text-gray-500">Month</span>
-                                    <span className="font-medium">{payload[0].payload.name}</span>
+                                    <span className="text-sm font-medium text-gray-500">
+                                      Month
+                                    </span>
+                                    <span className="font-medium">
+                                      {payload[0].payload.name}
+                                    </span>
                                   </div>
                                   <div className="flex flex-col">
-                                    <span className="text-sm font-medium text-gray-500">Income</span>
-                                    <span className="font-medium">₹{payload[0].value.toLocaleString()}</span>
+                                    <span className="text-sm font-medium text-gray-500">
+                                      Income
+                                    </span>
+                                    <span className="font-medium">
+                                      ₹{payload[0].value.toLocaleString()}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
-                            )
+                            );
                           }
-                          return null
+                          return null;
                         }}
                       />
                       <Bar dataKey="income" fill="#333" radius={[4, 4, 0, 0]} />
@@ -197,31 +265,55 @@ export default function LawyerDashboard() {
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }) =>
+                          `${name}: ${(percent * 100).toFixed(0)}%`
+                        }
                       >
                         {caseStatusData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={index === 0 ? "#333" : index === 1 ? "#666" : "#999"} />
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={
+                              index === 0
+                                ? "#333"
+                                : index === 1
+                                ? "#666"
+                                : "#999"
+                            }
+                          />
                         ))}
                       </Pie>
                       <Tooltip
                         content={({ active, payload }) => {
-                          if (active && payload && payload.length && payload[0]) {
+                          if (
+                            active &&
+                            payload &&
+                            payload.length &&
+                            payload[0]
+                          ) {
                             return (
                               <div className="rounded-lg border border-gray-200 bg-white p-2 shadow-sm">
                                 <div className="grid grid-cols-2 gap-2">
                                   <div className="flex flex-col">
-                                    <span className="text-sm font-medium text-gray-500">Status</span>
-                                    <span className="font-medium">{payload[0].name}</span>
+                                    <span className="text-sm font-medium text-gray-500">
+                                      Status
+                                    </span>
+                                    <span className="font-medium">
+                                      {payload[0].name}
+                                    </span>
                                   </div>
                                   <div className="flex flex-col">
-                                    <span className="text-sm font-medium text-gray-500">Count</span>
-                                    <span className="font-medium">{payload[0].value}</span>
+                                    <span className="text-sm font-medium text-gray-500">
+                                      Count
+                                    </span>
+                                    <span className="font-medium">
+                                      {payload[0].value}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
-                            )
+                            );
                           }
-                          return null
+                          return null;
                         }}
                       />
                     </PieChart>
@@ -237,36 +329,56 @@ export default function LawyerDashboard() {
               <CardContent>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={casesByMonthData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <BarChart
+                      data={casesByMonthData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    >
                       <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
                       <XAxis dataKey="name" stroke="#333" />
                       <YAxis stroke="#333" />
                       <Tooltip
                         content={({ active, payload }) => {
-                          if (active && payload && payload.length && payload[0] && payload[0].payload) {
+                          if (
+                            active &&
+                            payload &&
+                            payload.length &&
+                            payload[0] &&
+                            payload[0].payload
+                          ) {
                             return (
                               <div className="rounded-lg border border-gray-200 bg-white p-2 shadow-sm">
                                 <div className="grid gap-2">
                                   <div className="flex flex-col">
-                                    <span className="text-sm font-medium text-gray-500">Month</span>
-                                    <span className="font-medium">{payload[0].payload.name}</span>
+                                    <span className="text-sm font-medium text-gray-500">
+                                      Month
+                                    </span>
+                                    <span className="font-medium">
+                                      {payload[0].payload.name}
+                                    </span>
                                   </div>
                                   {payload.map(
                                     (p) =>
                                       p && (
-                                        <div key={p.name} className="flex flex-col">
+                                        <div
+                                          key={p.name}
+                                          className="flex flex-col"
+                                        >
                                           <span className="text-sm font-medium text-gray-500">
-                                            {p.name && p.name.charAt(0).toUpperCase() + p.name.slice(1)}
+                                            {p.name &&
+                                              p.name.charAt(0).toUpperCase() +
+                                                p.name.slice(1)}
                                           </span>
-                                          <span className="font-medium">{p.value}</span>
+                                          <span className="font-medium">
+                                            {p.value}
+                                          </span>
                                         </div>
-                                      ),
+                                      )
                                   )}
                                 </div>
                               </div>
-                            )
+                            );
                           }
-                          return null
+                          return null;
                         }}
                       />
                       <Legend />
@@ -303,7 +415,9 @@ export default function LawyerDashboard() {
                           style={{ width: `${(rating.value / 100) * 100}%` }}
                         ></div>
                       </div>
-                      <div className="w-10 text-right text-sm">{rating.value}%</div>
+                      <div className="w-10 text-right text-sm">
+                        {rating.value}%
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -320,13 +434,18 @@ export default function LawyerDashboard() {
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`h-4 w-4 ${i < 5 ? "fill-current text-black" : "text-gray-300"}`}
+                              className={`h-4 w-4 ${
+                                i < 5
+                                  ? "fill-current text-black"
+                                  : "text-gray-300"
+                              }`}
                             />
                           ))}
                         </div>
                       </div>
                       <p className="text-sm text-gray-600">
-                        Excellent service. The lawyer was very professional and helped me win my case.
+                        Excellent service. The lawyer was very professional and
+                        helped me win my case.
                       </p>
                     </div>
                     <div className="rounded-lg border p-4">
@@ -339,13 +458,18 @@ export default function LawyerDashboard() {
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`h-4 w-4 ${i < 4 ? "fill-current text-black" : "text-gray-300"}`}
+                              className={`h-4 w-4 ${
+                                i < 4
+                                  ? "fill-current text-black"
+                                  : "text-gray-300"
+                              }`}
                             />
                           ))}
                         </div>
                       </div>
                       <p className="text-sm text-gray-600">
-                        Very knowledgeable and responsive. Would recommend to anyone needing legal assistance.
+                        Very knowledgeable and responsive. Would recommend to
+                        anyone needing legal assistance.
                       </p>
                     </div>
                   </div>
@@ -356,6 +480,5 @@ export default function LawyerDashboard() {
         </Tabs>
       </main>
     </div>
-  )
+  );
 }
-

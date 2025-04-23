@@ -36,3 +36,11 @@ export const milestoneEndpoints = {
     COMPLETE_MILESTONE: BASE_URL + "/milestone/complete-milestone",
     ACCEPT_MILESTONE :  BASE_URL + "/milestone/accept-milestone",
 }
+
+
+
+export const analyticsEndpoints = {
+    GET_ANALYTICS_MONTHLY_INCOME: BASE_URL + "/analytics/monthly-income",
+    GET_ANALYTICS_CASE_STATUS: BASE_URL + "/analytics/case-status",
+    GET_ANALYTICS_CASE_STATUS_BY_MONTH: BASE_URL + "/analytics/monthly-case-status",
+}

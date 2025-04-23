@@ -3,22 +3,68 @@ const Case = require('../models/Case');
 const User = require('../models/User');
 const moment = require('moment');
 
-exports.monthlyIncomeData = async(req,res) => {
-    try {
-        // Get the caseId from the request body
-        const {caseId} = req.body;
+// exports.monthlyIncomeData = async(req,res) => {
+//     try {
+//         // Get the caseId from the request body
+//         const {caseId} = req.body;
+//         console.log("caseId: ", caseId);
+//         // Fetch all milestones of the particular case and populate data
+//         const allMilestones = await Case.findById(caseId).populate('caseMilestones');
 
-        // Fetch all milestones of the particular case and populate data
-        const allMilestones = await Case.findById(caseId).populate('caseMilestones');
-        
+//         console.log("caseMilestones: ", allMilestones);
+//         // Create an empty array for monthly payments
+//         const monthlyPayments = Array(12).fill(0); // For each month from Jan to Dec
+
+//         // Iterate through each milestone to process payments
+//         allMilestones.caseMilestones.forEach(milestone => {
+//             const createdMonth = moment(milestone.createdAt).month(); // Get the month number (0-11)
+//             monthlyPayments[createdMonth] += milestone?.payment; // Sum the payment to the respective month
+//         });
+
+//         // Format the monthlyPayments for the response
+//         const monthlyIncomeData = monthlyPayments.map((income, index) => {
+//             return { name: moment().month(index).format("MMM"), income: income }; 
+//         });
+
+//         // Return response
+//         res.status(200).json({
+//             success: true,
+//             data: monthlyIncomeData
+//         });
+//     }
+//     catch(error) {
+//         res.status(500).json({
+//             success: false,
+//             message: "Failed to get monthly payment details",
+//             error: error.message
+//         });
+//     }
+// }
+
+exports.monthlyIncomeData = async (req, res) => {
+    try {
+        // Get the userId from the request body
+        const { userId } = req.body;
+        console.log("userId: ", userId);
+
+        // Fetch user and retrieve all associated cases
+        const user = await User.findById(userId).populate('cases');
+        if (!user || !user.cases || user.cases.length === 0) {
+            return res.status(404).json({ success: false, message: "No cases found for the user" });
+        }
+
         // Create an empty array for monthly payments
         const monthlyPayments = Array(12).fill(0); // For each month from Jan to Dec
 
-        // Iterate through each milestone to process payments
-        allMilestones.caseMilestones.forEach(milestone => {
-            const createdMonth = moment(milestone.createdAt).month(); // Get the month number (0-11)
-            monthlyPayments[createdMonth] += milestone.payment; // Sum the payment to the respective month
-        });
+        // Iterate through each case and their milestones to process payments
+        for (const caseItem of user.cases) {
+            const allMilestones = await Case.findById(caseItem._id).populate('caseMilestones');
+
+            allMilestones.caseMilestones.forEach(milestone => {
+                const createdMonth = moment(milestone.createdAt).month(); // Get the month number (0-11)
+                monthlyPayments[createdMonth] += milestone?.payment; // Sum the payment to the respective month
+            });
+        }
 
         // Format the monthlyPayments for the response
         const monthlyIncomeData = monthlyPayments.map((income, index) => {
@@ -30,15 +76,14 @@ exports.monthlyIncomeData = async(req,res) => {
             success: true,
             data: monthlyIncomeData
         });
-    }
-    catch(error) {
+    } catch (error) {
         res.status(500).json({
             success: false,
             message: "Failed to get monthly payment details",
             error: error.message
         });
     }
-}
+};
 
 exports.caseStatusData = async(req,res) => {
     try {
