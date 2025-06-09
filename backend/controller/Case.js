@@ -1,6 +1,7 @@
 const Milestone = require("../models/Milestone")
 const Case = require("../models/Case")
 const User = require("../models/User")
+const RatingAndReview = require("../models/RatingAndReview")
 const { uploadToCloudinary } = require("../utils/uploadToCloudinary")
 
 //for client
@@ -510,3 +511,76 @@ exports.uploadPdfForSummary = async(req, res) => {
         });
     }
 };
+
+
+exports.completeCase = async(req,res) => {
+    try {
+        const {caseId, rating, review} = req.body
+
+        console.log(req.body)
+
+        if(!caseId || !rating || !review) {
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required"
+            })
+        }
+
+        const case_ = await Case.findById(caseId)
+        console.log("case_: ", case_)
+
+        if(!case_) {
+            return res.status(404).json({
+                success: false,
+                message: "Case not found"
+            })
+        }
+
+        if(case_.status !== "In-progress") {
+            return res.status(400).json({   
+                success: false,
+                message: "Case is not in progress"
+            })
+        }
+
+        case_.status = "Closed"
+
+        await case_.save()
+
+        console.log("case_ saved")
+
+        //extract provider id from the case
+        const providerId = case_.serviceProvider
+
+        console.log("providerId: ", providerId)
+
+        //create a new rating and review
+        const ratingAndReview = await RatingAndReview.create({
+            user: providerId,
+            case: caseId,
+            rating,
+            review
+        })
+        
+        console.log("ratingAndReview: ", ratingAndReview)
+
+        //add rating and review id to the user
+        await User.findByIdAndUpdate(providerId, {
+            $push: {
+                ratingAndReviews: ratingAndReview._id
+            }
+        })
+
+
+        return res.status(200).json({
+            success: true,
+            message: "Case completed successfully"
+        })
+    }
+    catch(error) {
+        return res.status(400).json({
+            success: false,
+            message: "Error while completing case"
+        })
+    }
+}

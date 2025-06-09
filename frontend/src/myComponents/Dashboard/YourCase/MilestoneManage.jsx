@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Bell, CheckCircle, Clock, XCircle, Plus } from "lucide-react";
+import { Bell, CheckCircle, Clock, XCircle, Plus, Check } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -99,6 +100,7 @@ export default function MilestoneManage({ caseId }) {
   const [selectedMilestone, setSelectedMilestone] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState("");
+  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
   const token = useSelector((state) => state.auth.token);
   const [newMilestone, setNewMilestone] = useState({
     title: "",
@@ -132,9 +134,13 @@ export default function MilestoneManage({ caseId }) {
     setIsDialogOpen(true);
   };
 
-  const handleApproveMilestone = (milestone) => {
+  const handleApproveMilestone = async (milestone) => {
     const milestoneId = milestone._id;
-    const response = acceptMilestone({ token, milestoneId });
+    const response = await acceptMilestone({ token, milestoneId });
+    setShowPaymentSuccess(true);
+    setTimeout(() => {
+      setShowPaymentSuccess(false);
+    }, 2000);
   };
 
   // Handle add milestone
@@ -207,6 +213,58 @@ export default function MilestoneManage({ caseId }) {
 
   return (
     <div className="container mx-auto p-4 max-w-6xl">
+      <AnimatePresence>
+        {showPaymentSuccess && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{
+                type: "spring",
+                stiffness: 260,
+                damping: 20,
+                delay: 0.2,
+              }}
+              className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center"
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 20,
+                  delay: 0.2,
+                }}
+                className="w-24 h-24 rounded-full bg-black flex items-center justify-center mb-6"
+              >
+                <Check className="w-12 h-12 text-white" />
+              </motion.div>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="text-3xl font-bold mb-2"
+              >
+                Payment Successful
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+                className="text-gray-500 text-center"
+              >
+                Milestone has been approved successfully
+              </motion.p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <Card className="mb-6 border-black/10">
         <CardHeader>
           <div className="flex justify-between items-center">

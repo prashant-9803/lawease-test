@@ -7,7 +7,8 @@ const {
     GET_ALL_CASES_WITH_CLIENTS_API,
     GET_ALL_PENDING_CASES_API,
     ACCEPT_CASE_API,
-    REJECT_CASE_API
+    REJECT_CASE_API,
+    COMPLETE_CASE_API
 } = caseEndpoints;
 
 
@@ -154,6 +155,36 @@ export const rejectCase = async (token, caseId) => {
     } catch (error) {
         console.log("REJECT CASE ERROR", error);
         toast.error("Failed to reject case");
+        return false;
+    } finally {
+        toast.dismiss(toastId);
+    }
+};
+
+//function to complete a case
+export const completeCase = async (token, caseId, rating, review, navigate) => {
+    const toastId = toast.loading("Completing case...");
+
+    try {
+        const res = await apiConnector(
+            "POST",
+            COMPLETE_CASE_API,
+            { caseId, rating, review },
+            {
+                Authorization: `Bearer ${token}`
+            }
+        )
+
+        if(!res?.data?.success) {
+            throw new Error(res?.data?.message || "Could not complete case");
+        }
+
+        toast.success("Case completed successfully");
+        navigate("/dashboard/your-case");
+        return true;
+    } catch (error) {
+        console.log("COMPLETE CASE ERROR", error);
+        toast.error("Failed to complete case");
         return false;
     } finally {
         toast.dismiss(toastId);

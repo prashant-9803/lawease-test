@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react"
 import { getAllCasesWithClients } from "@/services/operations/caseAPI"
 import { useSelector } from "react-redux"
@@ -19,6 +18,7 @@ import {
 
 // Import the MilestoneManagement component
 import MilestoneManagement from "./MilestoneManage"
+import CaseCompletion from "./CaseCompletion"
 
 const CaseYour = () => {
   const [cases, setCases] = useState([])
@@ -367,6 +367,16 @@ const CaseYour = () => {
           >
             Payments
           </button>
+          <button
+            onClick={() => setActiveTab("closure")}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === "payments"
+                ? "border-black text-black"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            }`}
+          >
+            Case Closure
+          </button>
         </nav>
       </div>
 
@@ -591,6 +601,11 @@ const CaseYour = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Case Closure Tab */}
+        {activeTab === "closure" && (
+            <CaseCompletion caseData={selectedCase}/>
         )}
       </div>
 

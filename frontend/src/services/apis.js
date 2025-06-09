@@ -16,6 +16,7 @@ export const caseEndpoints = {
     REJECT_CASE_API: BASE_URL + "/case/rejectCase",
     GET_ALL_CASES_WITH_CLIENTS_API: BASE_URL + "/case/getAllCasesWithClients",
     GET_ALL_PENDING_CASES_API: BASE_URL + "/case/getAllPendingCases",
+    COMPLETE_CASE_API: BASE_URL + "/case/completeCase",
 }
 
 export const profileEndpoints = {
