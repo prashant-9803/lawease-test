@@ -1,9 +1,15 @@
-
-import { useEffect, useState } from "react"
-import { Bell, CheckCircle, Clock, XCircle, Plus } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useEffect, useState } from "react";
+import { Bell, CheckCircle, Clock, XCircle, Plus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -11,14 +17,26 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Progress } from "@/components/ui/progress"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { acceptMilestone, addMilestone, completeMilestone, getAllMilestones } from "@/services/operations/milestoneAPI"
-import { useSelector } from "react-redux"
+} from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  acceptMilestone,
+  addMilestone,
+  completeMilestone,
+  getAllMilestones,
+} from "@/services/operations/milestoneAPI";
+import { useSelector } from "react-redux";
 
 // Sample data for milestones
 //TODO: get from backend
@@ -26,7 +44,8 @@ const initialMilestones = [
   {
     _id: 1,
     title: "Case Creation",
-    description: "User submits a legal case with necessary details and documents.",
+    description:
+      "User submits a legal case with necessary details and documents.",
     status: "Completed",
     payment: 500,
   },
@@ -47,7 +66,8 @@ const initialMilestones = [
   {
     _id: 4,
     title: "Case Review & Document Verification",
-    description: "Legal expert reviews submitted documents for accuracy and validity.",
+    description:
+      "Legal expert reviews submitted documents for accuracy and validity.",
     status: "Pending",
     payment: 1500,
   },
@@ -74,90 +94,90 @@ const initialMilestones = [
   },
 ];
 
-
-
-export default function MilestoneManage({caseId}) {
-  const [milestones, setMilestones] = useState(initialMilestones)
-  const [selectedMilestone, setSelectedMilestone] = useState(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [dialogType, setDialogType] = useState("")
-  const token = useSelector((state) => state.auth.token)
+export default function MilestoneManage({ caseId }) {
+  const [milestones, setMilestones] = useState(initialMilestones);
+  const [selectedMilestone, setSelectedMilestone] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogType, setDialogType] = useState("");
+  const token = useSelector((state) => state.auth.token);
   const [newMilestone, setNewMilestone] = useState({
     title: "",
     description: "",
     payment: "",
-  })
+  });
 
-  const {user} = useSelector((state) => state.profile);
+  const { user } = useSelector((state) => state.profile);
   const accountType = user?.accountType;
 
   console.log("user: ", user);
 
-   
-  
-
   // Calculate completion percentage
   const completionPercentage = Math.round(
-    (milestones.filter((m) => m.status === "Completed").length / milestones.length) * 100,
-  )
+    (milestones.filter((m) => m.status === "Completed").length /
+      milestones.length) *
+      100
+  );
 
-  useEffect(async() => {
+  useEffect(async () => {
     console.log("selected case: ", caseId);
-    const response = await getAllMilestones({token, caseId}); 
+    const response = await getAllMilestones({ token, caseId });
     console.log("Respoinser", response);
-    setMilestones(response)
+    setMilestones(response);
   }, []);
-
-
 
   // Handle complete milestone
   const handleCompleteMilestone = (milestone) => {
-    setSelectedMilestone(milestone)
-    setDialogType("complete")
-    setIsDialogOpen(true)
-  }
+    setSelectedMilestone(milestone);
+    setDialogType("complete");
+    setIsDialogOpen(true);
+  };
 
   const handleApproveMilestone = (milestone) => {
     const milestoneId = milestone._id;
-    const response = acceptMilestone({token ,milestoneId});
-    
-  }
-
+    const response = acceptMilestone({ token, milestoneId });
+  };
 
   // Handle add milestone
   const handleAddMilestone = () => {
-    setDialogType("add")
-    setIsDialogOpen(true)
-  }
+    setDialogType("add");
+    setIsDialogOpen(true);
+  };
 
   // Handle new milestone input change
   const handleNewMilestoneChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setNewMilestone({
       ...newMilestone,
       [name]: value,
-    })
-  }
+    });
+  };
 
   // Submit dialog action
-  const handleDialogSubmit = async() => {
+  const handleDialogSubmit = async () => {
     if (dialogType === "request") {
       // In a real app, this would send a request to the server
-      alert(`Approval requested for milestone: ${selectedMilestone.title}`)
+      alert(`Approval requested for milestone: ${selectedMilestone.title}`);
     } else if (dialogType === "complete") {
       // Update milestone status
-      const response = await completeMilestone({token, milestoneId: selectedMilestone._id})
-      setMilestones(milestones.map((m) => (m._id === selectedMilestone._id ? { ...m, status: "Completed" } : m)))
+      const response = await completeMilestone({
+        token,
+        milestoneId: selectedMilestone._id,
+      });
+      setMilestones(
+        milestones.map((m) =>
+          m._id === selectedMilestone._id ? { ...m, status: "Completed" } : m
+        )
+      );
     } else if (dialogType === "add") {
       // Add new milestone
-      
-      const response = await addMilestone({token, caseId, newMilestone})
-      setMilestones([...milestones, response])
+
+      const response = await addMilestone({ token, caseId, newMilestone });
+      setMilestones([...milestones, response]);
       console.log("new milestones from frontend: ", milestones);
-      setNewMilestone({ title: "", description: "", payment: "" })
+      setNewMilestone({ title: "", description: "", payment: "" });
     }
-    setIsDialogOpen(false)
-  }
+    setIsDialogOpen(false);
+  };
 
   // Get badge color based on status
   const getStatusBadge = (status) => {
@@ -167,23 +187,23 @@ export default function MilestoneManage({caseId}) {
           <Badge className="bg-black text-white hover:bg-black/80">
             <CheckCircle className="w-3 h-3 mr-1" /> {status}
           </Badge>
-        )
+        );
       case "Rejected":
         return (
           <Badge variant="destructive">
             <XCircle className="w-3 h-3 mr-1" /> {status}
           </Badge>
-        )
+        );
       case "Pending":
         return (
           <Badge variant="outline" className="border-black text-black">
             <Clock className="w-3 h-3 mr-1" /> {status}
           </Badge>
-        )
+        );
       default:
-        return <Badge variant="secondary">{status}</Badge>
+        return <Badge variant="secondary">{status}</Badge>;
     }
-  }
+  };
 
   return (
     <div className="container mx-auto p-4 max-w-6xl">
@@ -192,7 +212,9 @@ export default function MilestoneManage({caseId}) {
           <div className="flex justify-between items-center">
             <div>
               <CardTitle className="text-2xl">Milestone Management</CardTitle>
-              <CardDescription>Track and manage project milestones</CardDescription>
+              <CardDescription>
+                Track and manage project milestones
+              </CardDescription>
             </div>
             <Button variant="outline" size="icon" className="border-black/20">
               <Bell className="h-4 w-4" />
@@ -203,9 +225,15 @@ export default function MilestoneManage({caseId}) {
           <div className="mb-6">
             <div className="flex justify-between mb-2">
               <span className="text-sm font-medium">Project Completion</span>
-              <span className="text-sm font-medium">{completionPercentage}%</span>
+              <span className="text-sm font-medium">
+                {completionPercentage}%
+              </span>
             </div>
-            <Progress value={completionPercentage} className="h-2 bg-gray-200" indicatorclassname="bg-black" />
+            <Progress
+              value={completionPercentage}
+              className="h-2 bg-gray-200"
+              indicatorclassname="bg-black"
+            />
           </div>
 
           <div className="overflow-x-auto">
@@ -224,35 +252,29 @@ export default function MilestoneManage({caseId}) {
                 {milestones.map((milestone) => (
                   <TableRow key={milestone._id}>
                     <TableCell className="font-bold">{milestone._id}</TableCell>
-                    <TableCell className="font-medium">{milestone.title}</TableCell>
+                    <TableCell className="font-medium">
+                      {milestone.title}
+                    </TableCell>
                     <TableCell>{milestone.description}</TableCell>
                     <TableCell>₹{milestone.payment.toLocaleString()}</TableCell>
                     <TableCell>{getStatusBadge(milestone.status)}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        {milestone.status === "Pending" && (
-                          <>
-                            
-                            {
-                              accountType == "Provider" ? (
-                                <Button variant="outline" size="sm" onClick={() => handleCompleteMilestone(milestone)}>
-                                  Complete
-                                </Button>
-                              ) : (
-                                <Button
-                              variant="default"
-                              size="sm"
-                              onClick={() => handleApproveMilestone(milestone)}
-                              className="bg-black text-white hover:bg-black/80"
-                            >
-                              Approve
-                            </Button>
-                              )
-                            }
-                            {/* <Button variant="destructive" size="sm" onClick={() => handleRejectMilestone(milestone)}>
-                              Reject
-                            </Button> */}
-                          </>
+                        {milestone.status === "Pending" && accountType === "Client" && (
+                          <Button
+                            onClick={() => handleApproveMilestone(milestone)}
+                            className="bg-black text-white hover:bg-black/80"
+                          >
+                            Approve
+                          </Button>
+                        )}
+                        {milestone.status === "In-progress" && accountType === "Provider" && (
+                          <Button
+                            onClick={() => handleCompleteMilestone(milestone)}
+                            className="bg-black text-white hover:bg-black/80"
+                          >
+                            Complete
+                          </Button>
                         )}
                       </div>
                     </TableCell>
@@ -262,19 +284,19 @@ export default function MilestoneManage({caseId}) {
             </Table>
           </div>
         </CardContent>
-       {
-        accountType == "Provider" ? (
+        {accountType == "Provider" ? (
           <CardFooter className="flex justify-end">
-          <Button onClick={handleAddMilestone} className="bg-black text-white hover:bg-black/80">
-            <Plus className="mr-2 h-4 w-4" /> Add Milestone
-          </Button>
-        </CardFooter>
-        ) : (<div></div>)
-       }
+            <Button
+              onClick={handleAddMilestone}
+              className="bg-black text-white hover:bg-black/80"
+            >
+              <Plus className="mr-2 h-4 w-4" /> Add Milestone
+            </Button>
+          </CardFooter>
+        ) : (
+          <div></div>
+        )}
       </Card>
-
-
-
 
       {/* milestone Statistics */}
       <div className="grid md:grid-cols-2 gap-6">
@@ -286,26 +308,35 @@ export default function MilestoneManage({caseId}) {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span>Completed</span>
-                <Badge variant="outline" className="bg-black/10 text-black hover:bg-black/10">
+                <Badge
+                  variant="outline"
+                  className="bg-black/10 text-black hover:bg-black/10"
+                >
                   {milestones.filter((m) => m.status === "Completed").length}
                 </Badge>
               </div>
               <div className="flex justify-between items-center">
                 <span>Pending</span>
-                <Badge variant="outline" className="bg-gray-100 text-black hover:bg-gray-100">
+                <Badge
+                  variant="outline"
+                  className="bg-gray-100 text-black hover:bg-gray-100"
+                >
                   {milestones.filter((m) => m.status === "Pending").length}
                 </Badge>
               </div>
               <div className="flex justify-between items-center">
                 <span>Rejected</span>
-                <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">
+                <Badge
+                  variant="outline"
+                  className="bg-red-100 text-red-800 hover:bg-red-100"
+                >
                   {milestones.filter((m) => m.status === "Rejected").length}
                 </Badge>
               </div>
             </div>
           </CardContent>
         </Card>
-        
+
         {/* recent activity */}
         <Card className="border-black/10">
           <CardHeader>
@@ -322,7 +353,9 @@ export default function MilestoneManage({caseId}) {
                 <p className="text-sm text-muted-foreground">1 day ago</p>
               </div>
               <div className="border-l-2 border-gray-500 pl-4 py-1">
-                <p className="font-medium">Development Sprint 1 submitted for approval</p>
+                <p className="font-medium">
+                  Development Sprint 1 submitted for approval
+                </p>
                 <p className="text-sm text-muted-foreground">5 hours ago</p>
               </div>
             </div>
@@ -343,9 +376,12 @@ export default function MilestoneManage({caseId}) {
             <DialogDescription>
               {selectedMilestone && dialogType !== "add" && (
                 <span>
-                  {dialogType === "request" && `Request approval for milestone: ${selectedMilestone.title}`}
-                  {dialogType === "complete" && `Are you sure you want to complete: ${selectedMilestone.title}?`}
-                  {dialogType === "reject" && `Are you sure you want to reject: ${selectedMilestone.title}?`}
+                  {dialogType === "request" &&
+                    `Request approval for milestone: ${selectedMilestone.title}`}
+                  {dialogType === "complete" &&
+                    `Are you sure you want to complete: ${selectedMilestone.title}?`}
+                  {dialogType === "reject" &&
+                    `Are you sure you want to reject: ${selectedMilestone.title}?`}
                 </span>
               )}
               {dialogType === "add" && "Add a new milestone to the project"}
@@ -389,13 +425,21 @@ export default function MilestoneManage({caseId}) {
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-black/20">
+            <Button
+              variant="outline"
+              onClick={() => setIsDialogOpen(false)}
+              className="border-black/20"
+            >
               Cancel
             </Button>
             <Button
               onClick={handleDialogSubmit}
               variant={dialogType === "reject" ? "destructive" : "default"}
-              className={dialogType !== "reject" ? "bg-black text-white hover:bg-black/80" : ""}
+              className={
+                dialogType !== "reject"
+                  ? "bg-black text-white hover:bg-black/80"
+                  : ""
+              }
             >
               {dialogType === "request" && "Submit Request"}
               {dialogType === "complete" && "Complete"}
@@ -406,6 +450,5 @@ export default function MilestoneManage({caseId}) {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
-
